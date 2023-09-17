@@ -26,7 +26,8 @@ features = [
     "png",
     "hdr",
     "x11",
-    "filesystem_watcher"
+    "filesystem_watcher",
+    "dynamic_linking",
 ]
 
 [profile.dev]
