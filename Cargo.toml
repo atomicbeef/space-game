@@ -15,6 +15,7 @@ version = "0.11"
 default-features = false
 features = [
     "animation",
+    "bevy_animation",
     "bevy_asset",
     "bevy_gltf",
     "bevy_winit",
@@ -28,6 +29,11 @@ features = [
     "x11",
     "filesystem_watcher",
     "dynamic_linking",
+    "multi-threaded",
+    "ktx2",
+    "zstd",
+    "bevy_gizmos",
+    "tonemapping_luts",
 ]
 
 [profile.dev]
