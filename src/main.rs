@@ -5,6 +5,7 @@ use space_game::app_setup::{SetupGame, SetupBevyPlugins, SetupDebug};
 use space_game::camera::ActiveCamera;
 use space_game::fixed_update::{SetupFixedTimeStepSchedule, SetupRapier};
 use space_game::free_camera::FreeCamera;
+use space_game::player::SpawnPlayer;
 
 fn main() {
     App::new()
@@ -26,7 +27,7 @@ fn setup_test_scene(
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
             camera: Camera {
-                is_active: true,
+                is_active: false,
                 ..Default::default()
             },
             ..Default::default()
@@ -36,6 +37,8 @@ fn setup_test_scene(
         // Show the locally controlled player in the free camera
         RenderLayers::from_layers(&[0, 1]),
     ));
+
+    commands.add(SpawnPlayer::new(Transform::from_xyz(0.0, 0.0, 20.0)));
 
     commands.spawn(PbrBundle {
         mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),

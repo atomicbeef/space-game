@@ -6,6 +6,8 @@ use bevy_rapier3d::render::RapierDebugRenderPlugin;
 
 use crate::camera::{CameraPlugin, CameraDebugPlugin};
 use crate::free_camera::FreeCameraPlugin;
+use crate::player::PlayerPlugin;
+use crate::player_controller::PlayerControllerPlugin;
 use crate::settings::Settings;
 
 pub trait SetupBevyPlugins {
@@ -32,6 +34,8 @@ impl SetupGame for App {
         self.add_plugins((
             CameraPlugin,
             FreeCameraPlugin,
+            PlayerPlugin,
+            PlayerControllerPlugin,
         ))
     }
 }
