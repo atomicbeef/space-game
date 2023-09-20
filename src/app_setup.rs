@@ -8,7 +8,7 @@ use crate::camera::{CameraPlugin, CameraDebugPlugin};
 use crate::free_camera::FreeCameraPlugin;
 use crate::player::PlayerPlugin;
 use crate::player_controller::PlayerControllerPlugin;
-use crate::settings::Settings;
+use crate::settings::{Settings, DebugSettingsPlugin};
 
 pub trait SetupBevyPlugins {
     fn setup_bevy_plugins(&mut self) -> &mut Self;
@@ -50,6 +50,7 @@ impl SetupDebug for App {
             RapierDebugRenderPlugin::default(),
             WorldInspectorPlugin::new(),
             CameraDebugPlugin,
+            DebugSettingsPlugin,
         ))
     }
 }
