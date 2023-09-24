@@ -1,7 +1,9 @@
 pub mod app_setup;
+pub mod block;
 pub mod camera;
 pub mod free_camera;
 pub mod fixed_update;
+pub mod grid;
 pub mod player;
 pub mod player_camera;
 pub mod player_controller;

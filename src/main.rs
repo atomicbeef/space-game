@@ -2,9 +2,11 @@ use bevy::prelude::*;
 
 use bevy::render::view::RenderLayers;
 use space_game::app_setup::{SetupGame, SetupBevyPlugins, SetupDebug};
+use space_game::block::{Block, BlockMaterial};
 use space_game::camera::ActiveCamera;
 use space_game::fixed_update::{SetupFixedTimeStepSchedule, SetupRapier};
 use space_game::free_camera::FreeCamera;
+use space_game::grid::{command::SpawnGrid, Grid, GridPos};
 use space_game::player::SpawnPlayer;
 
 fn main() {
@@ -41,9 +43,20 @@ fn setup_test_scene(
     commands.add(SpawnPlayer::new(Transform::from_xyz(0.0, 0.0, 20.0)));
 
     commands.spawn(PbrBundle {
-        mesh: meshes.add(Mesh::from(shape::Cube { size: 1.0 })),
+        mesh: meshes.add(Mesh::from(shape::Cube { size: 2.5 })),
         material: materials.add(Color::rgb(0.0, 0.0, 1.0).into()),
-        transform: Transform::from_xyz(0.0, 0.0, 0.0),
+        transform: Transform::from_xyz(5.0, 0.0, 0.0),
         ..default()
     });
+
+    let mut cube_grid = Grid::new();
+    for x in -5..5 {
+        for y in -5..5 {
+            for z in -5..5 {
+                cube_grid.set(GridPos::new(x, y, z), Block { material: BlockMaterial::Aluminum });
+            }
+        }
+    }
+
+    commands.add(SpawnGrid::new(Transform::from_xyz(0.0, 0.0, 0.0), cube_grid));
 }
