@@ -1,3 +1,4 @@
+pub mod collider;
 pub mod command;
 pub mod mesh;
 pub mod plugin;
