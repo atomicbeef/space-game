@@ -1,9 +1,10 @@
 use bevy::{prelude::*, ecs::system::{Command, SystemState}};
 use bevy_rapier3d::prelude::*;
+use big_space::FloatingOrigin;
 
-use crate::player_camera::{PlayerCameraBundle, PlayerCamera};
-use crate::fixed_update::FixedUpdateSet;
+use crate::{player_camera::{PlayerCameraBundle, PlayerCamera}, UniverseGrid};
 use crate::camera::ActiveCamera;
+use crate::fixed_update::FixedUpdateSet;
 use crate::player_controller::ActivelyControlled;
 use crate::fixed_update::AddFixedEvent;
 
@@ -19,6 +20,7 @@ pub struct PlayerBundle {
     pub locked_axes: LockedAxes,
     pub damping: Damping,
     pub external_impulse: ExternalImpulse,
+    pub grid_cell: UniverseGrid,
 }
 
 #[derive(Event)]
@@ -65,6 +67,7 @@ impl Command for SpawnPlayer {
             locked_axes: LockedAxes::empty(),
             damping: Damping { linear_damping: 2.0, angular_damping: 4.0 },
             external_impulse: ExternalImpulse::default(),
+            grid_cell: UniverseGrid::default(),
         }).with_children(|parent| {
             parent.spawn(PlayerCameraBundle::new(Transform::from_xyz(0.0, 0.95, 0.0)));
         }).id();
@@ -99,12 +102,12 @@ fn control_newly_spawned_player(
 
         // Remove ActiveCamera component from old camera
         if let Ok((old_entity, mut old_camera)) = camera_set.p0().get_single_mut() {
-            commands.entity(old_entity).remove::<ActiveCamera>();
+            commands.entity(old_entity).remove::<(ActiveCamera, FloatingOrigin)>();
             old_camera.is_active = false;
         }
 
         // Set new player to actively controlled
-        commands.entity(event.0).insert(ActivelyControlled);
+        commands.entity(event.0).insert((ActivelyControlled, FloatingOrigin));
 
         // Set player camera to active
         let Ok(new_player_children) = children_query.get(event.0) else { return; };

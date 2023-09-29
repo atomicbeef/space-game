@@ -3,7 +3,9 @@ use bevy::log::{Level, LogPlugin};
 use bevy::window::close_on_esc;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::render::RapierDebugRenderPlugin;
+use big_space::FloatingOriginPlugin;
 
+use crate::UniverseGridPrecision;
 use crate::camera::{CameraPlugin, CameraDebugPlugin};
 use crate::free_camera::FreeCameraPlugin;
 use crate::grid::plugin::GridPlugin;
@@ -20,7 +22,8 @@ impl SetupBevyPlugins for App {
         self.add_plugins(DefaultPlugins.set(LogPlugin {
             level: Level::DEBUG,
             filter: "wgpu=error,naga=error".to_string()
-        }))
+        }).disable::<TransformPlugin>())
+        .add_plugins(FloatingOriginPlugin::<UniverseGridPrecision>::default())
     }
 }
 

@@ -2,6 +2,8 @@ use bevy::prelude::*;
 use bevy::ecs::system::{Command, SystemState};
 use bevy_rapier3d::prelude::*;
 
+use crate::UniverseGrid;
+
 use super::Grid;
 use super::collider::generate_colliders_for_grid;
 use super::mesh::generate_grid_mesh;
@@ -42,6 +44,7 @@ impl Command for SpawnGrid {
             RigidBody::Dynamic,
             collider,
             Ccd::enabled(),
+            UniverseGrid::default(),
         ));
 
         system_state.apply(world);

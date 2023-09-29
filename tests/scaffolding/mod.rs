@@ -10,9 +10,10 @@ use bevy::scene::ScenePlugin;
 use bevy::input::{InputPlugin, ButtonState};
 use bevy::pbr::PbrPlugin;
 
+use big_space::{FloatingOriginPlugin, FloatingOrigin};
 use space_game::app_setup::SetupGame;
 use space_game::fixed_update::{SetupFixedTimeStepSchedule, SetupRapier, FixedUpdateSet};
-use space_game::PHYSICS_TIMESTEP;
+use space_game::{PHYSICS_TIMESTEP, UniverseGrid, UniverseGridPrecision};
 
 pub trait SetupBevyPlugins {
     fn setup_bevy_plugins(&mut self) -> &mut Self;
@@ -22,7 +23,6 @@ impl SetupBevyPlugins for App {
     fn setup_bevy_plugins(&mut self) -> &mut Self {
         self.add_plugins((
             MinimalPlugins,
-            TransformPlugin,
             HierarchyPlugin,
             DiagnosticsPlugin,
             AssetPlugin::default(),
@@ -45,6 +45,7 @@ impl SetupBevyPlugins for App {
                 ..Default::default()
             },
             PbrPlugin::default(),
+            FloatingOriginPlugin::<UniverseGridPrecision>::default()
         ))
     }
 }
@@ -61,6 +62,13 @@ impl GameTest for App {
             .setup_fixed_timestep_schedule()
             .setup_rapier()
             .setup_game();
+
+        // Spawn an entity to act as the floating origin so that the game doesn't crash
+        app.world.spawn((
+            TransformBundle::default(),
+            UniverseGrid::default(),
+            FloatingOrigin,
+        ));
 
         app
     }

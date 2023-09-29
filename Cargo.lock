@@ -1000,6 +1000,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "big_space"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "893ba33ee70aa50ddcbc8f8028e5abe77382711ef2bcf65d8cd28034ca803c6a"
+dependencies = [
+ "bevy",
+]
+
+[[package]]
 name = "bit-set"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2889,6 +2898,7 @@ dependencies = [
  "bevy-inspector-egui",
  "bevy_egui",
  "bevy_rapier3d",
+ "big_space",
 ]
 
 [[package]]

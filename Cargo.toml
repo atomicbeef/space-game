@@ -9,6 +9,7 @@ edition = "2021"
 bevy_egui = "0.21"
 bevy-inspector-egui = "0.19"
 bevy_rapier3d = { git = "https://github.com/dimforge/bevy_rapier.git", features = [ "debug-render-3d", "simd-stable" ] }
+big_space = { version = "0.3.0", default-features = false, features = ["debug"] }
 
 [dependencies.bevy]
 version = "0.11"

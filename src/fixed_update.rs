@@ -3,10 +3,12 @@ use std::marker::PhantomData;
 
 use bevy::prelude::*;
 use bevy::input::{InputSystem, mouse::MouseMotion};
-use bevy::transform::{systems::{sync_simple_transforms, propagate_transforms}, TransformSystem};
+use bevy::transform::TransformSystem;
 use bevy_rapier3d::prelude::*;
+use big_space::propagation::propagate_transforms;
+use big_space::{recenter_transform_on_grid, sync_simple_transforms, update_global_from_grid};
 
-use crate::PHYSICS_TIMESTEP;
+use crate::{PHYSICS_TIMESTEP, UniverseGridPrecision};
 
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 pub enum FixedUpdateSet {
@@ -54,10 +56,13 @@ impl SetupFixedTimeStepSchedule for App {
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::PostUpdateFlush));
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::LastFlush));
 
-            schedule.add_systems(sync_simple_transforms.in_set(TransformSystem::TransformPropagate)
-                .ambiguous_with(PropagateTransformsSet)
-            );
-            schedule.add_systems(propagate_transforms.in_set(PropagateTransformsSet));
+            schedule.add_systems((
+                recenter_transform_on_grid::<UniverseGridPrecision>,
+                (sync_simple_transforms::<UniverseGridPrecision>, update_global_from_grid::<UniverseGridPrecision>)
+                    .after(recenter_transform_on_grid::<UniverseGridPrecision>)
+                    .before(propagate_transforms::<UniverseGridPrecision>),
+                propagate_transforms::<UniverseGridPrecision>,
+            ).in_set(TransformSystem::TransformPropagate));
         });
 
         self.add_plugins(FixedInputPlugin)

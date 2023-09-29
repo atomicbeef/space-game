@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use big_space::FloatingOrigin;
 
 use crate::player_controller::ActivelyControlled;
 use crate::settings::Settings;
@@ -19,13 +20,13 @@ fn cycle_cameras(
 
         if let Ok((active_camera, potential_player)) = active_camera_query.get_single_mut() {
             // Deactivate old active camera
-            commands.entity(active_camera).remove::<ActiveCamera>();
+            commands.entity(active_camera).remove::<(ActiveCamera, FloatingOrigin)>();
             if let Ok((_, _, mut camera)) = camera_query.get_mut(active_camera) {
                 camera.is_active = false;
             }
             
             if let Some(player) = potential_player {
-                commands.entity(player.get()).remove::<ActivelyControlled>();
+                commands.entity(player.get()).remove::<(ActivelyControlled, FloatingOrigin)>();
             }
 
             let (new_active_camera, new_potential_player, mut camera) = match camera_query.iter_mut()
@@ -38,9 +39,14 @@ fn cycle_cameras(
             commands.entity(new_active_camera).insert(ActiveCamera);
             camera.is_active = true;
 
-            if let Some(player) = new_potential_player {
-                commands.entity(player.get()).insert(ActivelyControlled);
-            }
+            match new_potential_player {
+                Some(player) => {
+                    commands.entity(player.get()).insert((ActivelyControlled, FloatingOrigin));
+                },
+                None => {
+                    commands.entity(new_active_camera).insert(FloatingOrigin);
+                }
+            };
         }
     }
 }
