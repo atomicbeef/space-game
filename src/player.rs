@@ -94,10 +94,10 @@ fn control_newly_spawned_player(
     )>,
     children_query: Query<&Children>,
 ) {
-    for event in spawned_events.iter() {
+    if let Some(event) = spawned_events.iter().last() {
         // Remove ActivelyControlled component from old entity
         if let Ok(old_actively_controlled) = actively_controlled_query.get_single() {
-            commands.entity(old_actively_controlled).remove::<ActivelyControlled>();
+            commands.entity(old_actively_controlled).remove::<(ActivelyControlled, FloatingOrigin)>();
         }
 
         // Remove ActiveCamera component from old camera
