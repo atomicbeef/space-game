@@ -5,8 +5,6 @@ use bevy::prelude::*;
 use bevy::input::{InputSystem, mouse::MouseMotion};
 use bevy::transform::TransformSystem;
 use bevy_rapier3d::prelude::*;
-use big_space::propagation::propagate_transforms;
-use big_space::{recenter_transform_on_grid, sync_simple_transforms, update_global_from_grid};
 
 use crate::{PHYSICS_TIMESTEP, UniverseGridPrecision};
 
@@ -55,14 +53,6 @@ impl SetupFixedTimeStepSchedule for App {
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::UpdateFlush));
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::PostUpdateFlush));
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::LastFlush));
-
-            schedule.add_systems((
-                recenter_transform_on_grid::<UniverseGridPrecision>,
-                (sync_simple_transforms::<UniverseGridPrecision>, update_global_from_grid::<UniverseGridPrecision>)
-                    .after(recenter_transform_on_grid::<UniverseGridPrecision>)
-                    .before(propagate_transforms::<UniverseGridPrecision>),
-                propagate_transforms::<UniverseGridPrecision>,
-            ).in_set(TransformSystem::TransformPropagate));
         });
 
         self.add_plugins(FixedInputPlugin)
@@ -83,10 +73,9 @@ impl SetupRapier for App {
             gravity: Vec3::default(),
             ..Default::default()
         };
-    
+
         self.insert_resource(rapier_config)
-            .add_plugins(RapierPhysicsPlugin::<NoUserData>::default().in_fixed_schedule())
-            
+            .add_plugins(RapierPhysicsPlugin::<NoUserData, UniverseGridPrecision>::default().in_fixed_schedule())
     }
 }
 

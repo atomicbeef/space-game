@@ -40,7 +40,7 @@ fn setup_test_scene(
         UniverseGrid::default(),
     ));
 
-    commands.add(SpawnPlayer::new(Transform::from_xyz(50000.0, 0.0, 20.0)));
+    commands.add(SpawnPlayer::new(Transform::from_xyz(50000.0, 0.0, 40.0), UniverseGrid::default()));
 
     commands.spawn((
         PbrBundle {
@@ -62,4 +62,16 @@ fn setup_test_scene(
     }
 
     commands.add(SpawnGrid::new(Transform::from_xyz(50000.0, 0.0, 0.0), cube_grid));
+
+    commands.spawn((
+        PbrBundle {
+            mesh: meshes.add(Mesh::from(shape::Cube { size: 2.5 })),
+            material: materials.add(Color::rgb(1.0, 0.0, 0.0).into()),
+            transform: Transform::from_xyz(0.0, 0.0, 0.0),
+            ..default()
+        },
+        UniverseGrid::default(),
+    ));
+
+    commands.add(SpawnPlayer::new(Transform::from_xyz(0.0, 0.0, 20.0), UniverseGrid::default()));
 }

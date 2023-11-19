@@ -29,14 +29,18 @@ fn cycle_cameras(
                 commands.entity(player.get()).remove::<(ActivelyControlled, FloatingOrigin)>();
             }
 
-            let (new_active_camera, new_potential_player, mut camera) = match camera_query.iter_mut()
-                .skip_while(|&(entity, _, _)| entity == active_camera)
-                .next() {
-                    Some((entity, maybe_player, camera)) => (entity, maybe_player, camera),
-                    None => camera_query.iter_mut().next().unwrap(),
+            let mut camera_data: Vec<(Entity, Option<&Parent>, Mut<'_, Camera>)> = camera_query.iter_mut().collect();
+            camera_data.sort_by(|(entity, _, _) , (other_entity, _, _)| entity.cmp(other_entity));
+
+            let current_camera_index = camera_data.iter().position(|(entity, _, _)| *entity == active_camera).unwrap();
+            let (new_active_camera, new_potential_player, camera) =
+                if current_camera_index == camera_data.len() - 1 {
+                    &mut camera_data[0]
+                } else {
+                    &mut camera_data[current_camera_index + 1]
                 };
             
-            commands.entity(new_active_camera).insert(ActiveCamera);
+            commands.entity(*new_active_camera).insert(ActiveCamera);
             camera.is_active = true;
 
             match new_potential_player {
@@ -44,7 +48,7 @@ fn cycle_cameras(
                     commands.entity(player.get()).insert((ActivelyControlled, FloatingOrigin));
                 },
                 None => {
-                    commands.entity(new_active_camera).insert(FloatingOrigin);
+                    commands.entity(*new_active_camera).insert(FloatingOrigin);
                 }
             };
         }

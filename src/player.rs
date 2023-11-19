@@ -28,6 +28,7 @@ pub struct PlayerSpawned(pub Entity);
 
 pub struct SpawnPlayer {
     pub transform: Transform,
+    pub grid_cell: UniverseGrid,
 }
 
 impl Command for SpawnPlayer {
@@ -67,7 +68,7 @@ impl Command for SpawnPlayer {
             locked_axes: LockedAxes::empty(),
             damping: Damping { linear_damping: 2.0, angular_damping: 4.0 },
             external_impulse: ExternalImpulse::default(),
-            grid_cell: UniverseGrid::default(),
+            grid_cell: self.grid_cell,
         }).with_children(|parent| {
             parent.spawn(PlayerCameraBundle::new(Transform::from_xyz(0.0, 0.95, 0.0)));
         }).id();
@@ -79,8 +80,8 @@ impl Command for SpawnPlayer {
 }
 
 impl SpawnPlayer {
-    pub fn new(transform: Transform) -> Self {
-        Self { transform }
+    pub fn new(transform: Transform, grid_cell: UniverseGrid) -> Self {
+        Self { transform, grid_cell }
     }
 }
 

@@ -1,7 +1,5 @@
 use bevy::prelude::*;
 
-use crate::UniverseGrid;
-
 #[derive(Component)]
 pub struct PlayerCamera;
 
@@ -9,7 +7,6 @@ pub struct PlayerCamera;
 pub struct PlayerCameraBundle {
     pub camera: Camera3dBundle,
     pub player_camera: PlayerCamera,
-    pub grid_cell: UniverseGrid,
 }
 
 impl PlayerCameraBundle {
@@ -21,7 +18,6 @@ impl PlayerCameraBundle {
                 ..Default::default()
             },
             player_camera: PlayerCamera,
-            grid_cell: UniverseGrid::default(),
         }
     }
 }
