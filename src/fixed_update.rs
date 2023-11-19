@@ -71,6 +71,7 @@ impl SetupRapier for App {
                 substeps: 1,
             },
             gravity: Vec3::default(),
+            force_update_from_transform_changes: true,
             ..Default::default()
         };
 
