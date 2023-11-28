@@ -11,6 +11,6 @@ pub mod player_camera;
 pub mod player_controller;
 pub mod settings;
 
-pub const PHYSICS_TIMESTEP: f32 = 1.0 / 60.0;
+pub const PHYSICS_TIMESTEP: f32 = 1.0 / 64.0;
 pub type UniverseGridPrecision = i32;
 pub type UniverseGrid = GridCell<UniverseGridPrecision>;
