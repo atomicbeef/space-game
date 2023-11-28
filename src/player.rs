@@ -95,7 +95,7 @@ fn control_newly_spawned_player(
     )>,
     children_query: Query<&Children>,
 ) {
-    if let Some(event) = spawned_events.iter().last() {
+    if let Some(event) = spawned_events.read().last() {
         // Remove ActivelyControlled component from old entity
         if let Ok(old_actively_controlled) = actively_controlled_query.get_single() {
             commands.entity(old_actively_controlled).remove::<(ActivelyControlled, FloatingOrigin)>();

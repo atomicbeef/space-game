@@ -68,7 +68,7 @@ fn player_movement(
 
     let scale_factor = window.height().min(window.width());
 
-    for motion in motion_reader.iter() {
+    for motion in motion_reader.read() {
         rotate_vector += player_transform.left() * motion.delta.y * settings.first_person_sensitivity * scale_factor * 12.5;
         rotate_vector += player_transform.down() * motion.delta.x * settings.first_person_sensitivity * scale_factor;
     }

@@ -46,7 +46,7 @@ fn camera_rotate(
     let primary_window = primary_window_query.get_single();
     if let Ok(window) = primary_window {
         for mut transform in camera_query.iter_mut() {
-            for ev in motion_evr.iter() {
+            for ev in motion_evr.read() {
                 match window.cursor.grab_mode {
                     CursorGrabMode::None => {},
                     CursorGrabMode::Confined | CursorGrabMode::Locked => {

@@ -26,7 +26,7 @@ pub fn regenerate_grid_colliders(
     grid_query: Query<&Grid>,
     mut commands: Commands,
 ) {
-    for grid_changed in grid_changed_events.iter() {
+    for grid_changed in grid_changed_events.read() {
         let Ok(grid) = grid_query.get(grid_changed.0) else {
             return;
         };

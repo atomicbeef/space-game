@@ -5,6 +5,7 @@ use bevy::input::mouse::MouseButtonInput;
 use bevy::prelude::*;
 use bevy::log::{LogPlugin, Level};
 use bevy::diagnostic::DiagnosticsPlugin; 
+use bevy::render::settings::RenderCreation;
 use bevy::render::{RenderPlugin, settings::WgpuSettings};
 use bevy::scene::ScenePlugin;
 use bevy::input::{InputPlugin, ButtonState};
@@ -28,10 +29,10 @@ impl SetupBevyPlugins for App {
             AssetPlugin::default(),
             ScenePlugin,
             RenderPlugin {
-                wgpu_settings: WgpuSettings {
+                render_creation: RenderCreation::Automatic(WgpuSettings {
                     backends: None,
                     ..Default::default()
-                }
+                }),
             },
             ImagePlugin::default(),
             LogPlugin {
@@ -80,11 +81,11 @@ pub trait FixedUpdate {
 
 impl FixedUpdate for App {
     fn fixed_update(&mut self) {
-        let mut time = self.world.get_resource_mut::<FixedTime>().unwrap();
+        let overstep = self.world.get_resource::<Time<Fixed>>().unwrap().overstep();
+        let mut time = self.world.get_resource_mut::<Time<Real>>().unwrap();
 
-        let accumulated = time.accumulated();
-        if accumulated < Duration::from_secs_f32(PHYSICS_TIMESTEP) {
-            time.tick(Duration::from_secs_f32(PHYSICS_TIMESTEP) - accumulated);
+        if overstep <= Duration::from_secs_f32(PHYSICS_TIMESTEP) {
+            time.advance_by(Duration::from_secs_f32(PHYSICS_TIMESTEP + 0.015) - overstep);
         }
 
         self.update();
@@ -151,4 +152,8 @@ fn fixed_update_works() {
     app.fixed_update();
 
     assert_eq!(1, app.world.get_resource::<TestResource>().unwrap().0);
+
+    app.fixed_update();
+
+    assert_eq!(2, app.world.get_resource::<TestResource>().unwrap().0);
 }

@@ -6,18 +6,22 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-bevy_egui = "0.21"
-bevy-inspector-egui = "0.19"
-bevy_rapier3d = { git = "https://github.com/atomicbeef/bevy_rapier_big_space.git", features = [ "debug-render-3d", "simd-stable" ] }
+bevy_egui = "0.23"
+bevy-inspector-egui = "0.21"
+
+[dependencies.bevy_rapier3d]
+git = "https://github.com/atomicbeef/bevy_rapier_big_space.git"
+branch = "big_space"
+features = ["debug-render-3d", "simd-stable"]
 
 [dependencies.big_space]
 git = "https://github.com/atomicbeef/big_space"
-rev = "3baa87c"
+branch = "update-global-transform-when-changing-floating-origin"
 default-features=false
 features = ["debug"]
 
 [dependencies.bevy]
-version = "0.11"
+version = "0.12"
 default-features = false
 features = [
     "animation",
@@ -33,7 +37,7 @@ features = [
     "png",
     "hdr",
     "x11",
-    "filesystem_watcher",
+    "file_watcher",
     "dynamic_linking",
     "multi-threaded",
     "ktx2",

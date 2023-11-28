@@ -46,8 +46,8 @@ impl SetupFixedTimeStepSchedule for App {
                 FixedUpdateSet::LastFlush,
             ).chain());
 
-            schedule.configure_set(TransformSystem::TransformPropagate.in_set(FixedUpdateSet::PostUpdate));
-            schedule.configure_set(PropagateTransformsSet.in_set(TransformSystem::TransformPropagate));
+            schedule.configure_sets(TransformSystem::TransformPropagate.in_set(FixedUpdateSet::PostUpdate));
+            schedule.configure_sets(PropagateTransformsSet.in_set(TransformSystem::TransformPropagate));
 
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::PreUpdateFlush));
             schedule.add_systems(apply_deferred.in_set(FixedUpdateSet::UpdateFlush));
@@ -172,7 +172,7 @@ fn send_fixed_mouse_motion_events(
     mut mouse_motion_reader: EventReader<MouseMotion>,
     mut fixed_mouse_motion_wrier: EventWriter<FixedMouseMotion>
 ) {
-    for event in mouse_motion_reader.iter() {
+    for event in mouse_motion_reader.read() {
         fixed_mouse_motion_wrier.send(FixedMouseMotion(*event));
     }
 }
