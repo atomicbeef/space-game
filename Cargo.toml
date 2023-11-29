@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 bevy_egui = "0.23"
-bevy-inspector-egui = "0.21"
+bevy-inspector-egui = { version = "0.21", features = ["highlight_changes"] }
 
 [dependencies.bevy_rapier3d]
 git = "https://github.com/atomicbeef/bevy_rapier_big_space.git"
