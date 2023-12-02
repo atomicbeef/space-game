@@ -1,8 +1,10 @@
+use bevy::pbr::ExtendedMaterial;
 use bevy::prelude::*;
 use bevy::ecs::system::{Command, SystemState};
 use bevy_rapier3d::prelude::*;
 
 use crate::UniverseGrid;
+use crate::building_material::BuildingMaterial;
 
 use super::Grid;
 use super::collider::generate_colliders_for_grid;
@@ -17,7 +19,7 @@ impl Command for SpawnGrid {
     fn apply(self, world: &mut World) {
         let mut system_state: SystemState<(
             ResMut<Assets<Mesh>>,
-            ResMut<Assets<StandardMaterial>>,
+            ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
             Commands,
         )> = SystemState::new(world);
 
@@ -29,12 +31,16 @@ impl Command for SpawnGrid {
 
         let mesh = generate_grid_mesh(&self.grid);
         let mesh_handle = meshes.add(mesh);
-        let material_handle = materials.add(Color::rgb(0.5, 0.5, 0.5).into());
+        let material_handle = materials.add(
+            ExtendedMaterial {
+                base: Color::rgb(0.5, 0.5, 0.5).into(),
+                extension: BuildingMaterial::default(),
+            });
 
         let collider = generate_colliders_for_grid(&self.grid);
 
         commands.spawn((
-            PbrBundle {
+            MaterialMeshBundle {
                 mesh: mesh_handle,
                 material: material_handle,
                 transform: self.transform,

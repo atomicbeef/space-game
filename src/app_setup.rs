@@ -6,6 +6,7 @@ use bevy_rapier3d::render::RapierDebugRenderPlugin;
 use big_space::FloatingOriginPlugin;
 
 use crate::UniverseGridPrecision;
+use crate::building_material::BuildingMaterialPlugin;
 use crate::camera::{CameraPlugin, CameraDebugPlugin};
 use crate::free_camera::FreeCameraPlugin;
 use crate::grid::plugin::GridPlugin;
@@ -57,5 +58,15 @@ impl SetupDebug for App {
             CameraDebugPlugin,
             DebugSettingsPlugin,
         ))
+    }
+}
+
+pub trait SetupMaterials {
+    fn setup_materials(&mut self) -> &mut Self;
+}
+
+impl SetupMaterials for App {
+    fn setup_materials(&mut self) -> &mut Self {
+        self.add_plugins(BuildingMaterialPlugin)
     }
 }
