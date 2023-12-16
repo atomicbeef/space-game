@@ -12,7 +12,7 @@ use bevy::input::{InputPlugin, ButtonState};
 use bevy::pbr::PbrPlugin;
 
 use big_space::{FloatingOriginPlugin, FloatingOrigin};
-use space_game::app_setup::SetupGame;
+use space_game::app_setup::{SetupGame, SetupMaterials};
 use space_game::fixed_update::{SetupFixedTimeStepSchedule, SetupRapier, FixedUpdateSet};
 use space_game::{PHYSICS_TIMESTEP, UniverseGrid, UniverseGridPrecision};
 
@@ -62,7 +62,8 @@ impl GameTest for App {
         app.setup_bevy_plugins()
             .setup_fixed_timestep_schedule()
             .setup_rapier()
-            .setup_game();
+            .setup_game()
+            .setup_materials();
 
         // Spawn an entity to act as the floating origin so that the game doesn't crash
         app.world.spawn((

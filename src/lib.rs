@@ -1,7 +1,6 @@
 use big_space::GridCell;
 
 pub mod app_setup;
-pub mod block;
 pub mod building_material;
 pub mod camera;
 pub mod free_camera;

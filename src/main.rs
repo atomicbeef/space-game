@@ -5,12 +5,13 @@ use bevy::render::view::RenderLayers;
 use big_space::FloatingOrigin;
 use space_game::UniverseGrid;
 use space_game::app_setup::{SetupGame, SetupBevyPlugins, SetupDebug, SetupMaterials};
-use space_game::block::{Block, BlockMaterial};
+use space_game::grid::block::{Block, BlockMaterial};
 use space_game::building_material::BuildingMaterial;
 use space_game::camera::ActiveCamera;
 use space_game::fixed_update::{SetupFixedTimeStepSchedule, SetupRapier};
 use space_game::free_camera::FreeCamera;
-use space_game::grid::{command::SpawnGrid, Grid, GridPos};
+use space_game::grid::chunk::{Chunk, CHUNK_SIZE_CUBED};
+use space_game::grid::{command::SpawnGrid, Grid, ChunkPos};
 use space_game::player::SpawnPlayer;
 
 fn main() {
@@ -57,13 +58,8 @@ fn setup_test_scene(
     ));
 
     let mut cube_grid = Grid::new();
-    for x in -5..5 {
-        for y in -5..5 {
-            for z in -5..5 {
-                cube_grid.set(GridPos::new(x, y, z), Block { material: BlockMaterial::Aluminum });
-            }
-        }
-    }
+    let chunk = Chunk::new([Block { material: BlockMaterial::Aluminum }; CHUNK_SIZE_CUBED]);
+    cube_grid.set_chunk(ChunkPos::new(0, 0, 0), Some(chunk));
 
     commands.add(SpawnGrid::new(Transform::from_xyz(50000.0, 0.0, 0.0), cube_grid));
 

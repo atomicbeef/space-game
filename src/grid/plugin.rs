@@ -1,17 +1,19 @@
 use bevy::prelude::*;
 
-use super::GridChanged;
-use super::mesh::regenerate_grid_meshes;
-use super::collider::regenerate_grid_colliders;
+use crate::fixed_update::AddFixedEvent;
+
+use super::ChunkChanged;
+use super::mesh::regenerate_chunk_meshes;
+use super::collider::regenerate_chunk_colliders;
 
 pub struct GridPlugin;
 
 impl Plugin for GridPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<GridChanged>()
+        app.add_fixed_event::<ChunkChanged>()
             .add_systems(FixedUpdate, (
-                regenerate_grid_meshes,
-                regenerate_grid_colliders,
+                regenerate_chunk_meshes,
+                regenerate_chunk_colliders,
             ));
     }
 }

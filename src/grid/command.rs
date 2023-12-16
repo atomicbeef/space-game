@@ -1,14 +1,14 @@
-use bevy::pbr::ExtendedMaterial;
 use bevy::prelude::*;
 use bevy::ecs::system::{Command, SystemState};
 use bevy_rapier3d::prelude::*;
 
 use crate::UniverseGrid;
-use crate::building_material::BuildingMaterial;
+use crate::building_material::BuildingMaterialHandle;
 
 use super::Grid;
-use super::collider::generate_colliders_for_grid;
-use super::mesh::generate_grid_mesh;
+use super::block::BLOCK_SIZE;
+use super::collider::generate_collider_for_chunk;
+use super::mesh::generate_chunk_mesh;
 
 pub struct SpawnGrid {
     pub transform: Transform,
@@ -19,39 +19,55 @@ impl Command for SpawnGrid {
     fn apply(self, world: &mut World) {
         let mut system_state: SystemState<(
             ResMut<Assets<Mesh>>,
-            ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
+            Res<BuildingMaterialHandle>,
             Commands,
         )> = SystemState::new(world);
 
         let (
             mut meshes,
-            mut materials,
+            material_handle,
             mut commands,
         ) = system_state.get_mut(world);
 
-        let mesh = generate_grid_mesh(&self.grid);
-        let mesh_handle = meshes.add(mesh);
-        let material_handle = materials.add(
-            ExtendedMaterial {
-                base: Color::rgb(0.5, 0.5, 0.5).into(),
-                extension: BuildingMaterial::default(),
-            });
+        let mut chunk_entities = Vec::with_capacity(self.grid.chunks.len());
 
-        let collider = generate_colliders_for_grid(&self.grid);
+        for (pos, chunk) in self.grid.chunks.iter() {
+            let mesh = generate_chunk_mesh(chunk);
+            let mesh_handle = meshes.add(mesh);
+            let collider = generate_collider_for_chunk(chunk);
 
-        commands.spawn((
-            MaterialMeshBundle {
-                mesh: mesh_handle,
-                material: material_handle,
-                transform: self.transform,
-                ..Default::default()
-            },
-            self.grid,
-            RigidBody::Dynamic,
-            collider,
-            Ccd::enabled(),
-            UniverseGrid::default(),
-        ));
+            let entity = commands
+                .spawn((
+                    MaterialMeshBundle {
+                        mesh: mesh_handle,
+                        material: material_handle.0.clone().unwrap(),
+                        transform: Transform::from_translation(Vec3::new(
+                            pos.x as f32 * BLOCK_SIZE,
+                            pos.y as f32 * BLOCK_SIZE,
+                            pos.z as f32 * BLOCK_SIZE,
+                        )),
+                        ..Default::default()
+                    },
+                    collider,
+                    *pos,
+                ))
+                .id();
+
+            chunk_entities.push(entity);
+        }
+
+        commands
+            .spawn((
+                SpatialBundle {
+                    transform: self.transform,
+                    ..Default::default()
+                },
+                self.grid,
+                RigidBody::Dynamic,
+                Ccd::enabled(),
+                UniverseGrid::default(),
+            ))
+            .push_children(&chunk_entities);
 
         system_state.apply(world);
     }

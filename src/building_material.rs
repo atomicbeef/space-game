@@ -26,12 +26,31 @@ impl MaterialExtension for BuildingMaterial {
     }
 }
 
+#[derive(Resource)]
+pub struct BuildingMaterialHandle(pub Option<Handle<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>);
+
+fn init_building_material(
+    mut materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
+    mut building_material_handle: ResMut<BuildingMaterialHandle>,
+) {
+    let material_handle = materials.add(
+        ExtendedMaterial {
+            base: Color::rgb(0.5, 0.5, 0.5).into(),
+            extension: BuildingMaterial::default(),
+        });
+
+    building_material_handle.0 = Some(material_handle);
+}
+
 pub struct BuildingMaterialPlugin;
 
 impl Plugin for BuildingMaterialPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins(
-            MaterialPlugin::<ExtendedMaterial<StandardMaterial, BuildingMaterial>>::default()
-        );
+        app
+            .add_plugins(
+                MaterialPlugin::<ExtendedMaterial<StandardMaterial, BuildingMaterial>>::default()
+            )
+            .insert_resource(BuildingMaterialHandle(None))
+            .add_systems(Startup, init_building_material);
     }
 }

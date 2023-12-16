@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 use bevy::render::mesh::{Indices, Mesh, PrimitiveTopology};
 
-use super::{Grid, GridPos, GridChanged};
-use crate::block::BLOCK_SIZE;
+use super::block::BlockMaterial;
+use super::chunk::{Chunk, CHUNK_SIZE};
+use super::{Grid, ChunkPos, ChunkChanged};
+use crate::grid::block::BLOCK_SIZE;
 
 fn add_right_face(
     x: f32,
@@ -178,96 +180,110 @@ fn add_back_face(
     *index_offset += 4;
 }
 
-pub fn generate_grid_mesh(grid: &Grid) -> Mesh {
+pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
     let mut vertices: Vec<[f32; 3]> = Vec::new();
     let mut normals: Vec<[f32; 3]> = Vec::new();
     let mut uvs: Vec<[f32; 2]> = Vec::new();
     let mut triangles: Vec<u32> = Vec::new();
     let mut index_offset = 0;
 
-    for (grid_pos, _) in grid.blocks.iter() {
-        let x = grid_pos.x as f32 * BLOCK_SIZE;
-        let y = grid_pos.y as f32 * BLOCK_SIZE;
-        let z = grid_pos.z as f32 * BLOCK_SIZE;
+    for c_z in 0..CHUNK_SIZE {
+        for c_y in 0..CHUNK_SIZE {
+            for c_x in 0..CHUNK_SIZE {
+                let x = c_x as f32 * BLOCK_SIZE;
+                let y = c_y as f32 * BLOCK_SIZE;
+                let z = c_z as f32 * BLOCK_SIZE;
 
-        if grid.blocks.get(&GridPos::new(grid_pos.x + 1, grid_pos.y, grid_pos.z)).is_none() {
-            add_right_face(
-                x + BLOCK_SIZE,
-                y,
-                y + BLOCK_SIZE,
-                z,
-                z + BLOCK_SIZE,
-                &mut vertices,
-                &mut triangles,
-                &mut normals,
-                &mut uvs,
-                &mut index_offset
-            );
-        } if grid.blocks.get(&GridPos::new(grid_pos.x - 1, grid_pos.y, grid_pos.z)).is_none() {
-            add_left_face(
-                x,
-                y,
-                y + BLOCK_SIZE,
-                z,
-                z + BLOCK_SIZE,
-                &mut vertices,
-                &mut triangles,
-                &mut normals,
-                &mut uvs,
-                &mut index_offset
-            );
-        } if grid.blocks.get(&GridPos::new(grid_pos.x, grid_pos.y + 1, grid_pos.z)).is_none() {
-            add_top_face(
-                x,
-                x + BLOCK_SIZE,
-                y + BLOCK_SIZE,
-                z,
-                z + BLOCK_SIZE,
-                &mut vertices,
-                &mut triangles,
-                &mut normals,
-                &mut uvs,
-                &mut index_offset
-            );
-        } if grid.blocks.get(&GridPos::new(grid_pos.x, grid_pos.y - 1, grid_pos.z)).is_none() {
-            add_bottom_face(
-                x,
-                x + BLOCK_SIZE,
-                y,
-                z,
-                z + BLOCK_SIZE,
-                &mut vertices,
-                &mut triangles,
-                &mut normals,
-                &mut uvs,
-                &mut index_offset
-            );
-        } if grid.blocks.get(&GridPos::new(grid_pos.x, grid_pos.y, grid_pos.z + 1)).is_none() {
-            add_front_face(
-                x,
-                x + BLOCK_SIZE,
-                y,
-                y + BLOCK_SIZE,
-                z + BLOCK_SIZE,
-                &mut vertices,
-                &mut triangles,
-                &mut normals,
-                &mut uvs,
-                &mut index_offset
-            );
-        } if grid.blocks.get(&GridPos::new(grid_pos.x, grid_pos.y, grid_pos.z - 1)).is_none() {
-            add_back_face(
-                x,
-                x + BLOCK_SIZE,
-                y,
-                y + BLOCK_SIZE,
-                z,
-                &mut vertices,
-                &mut triangles,
-                &mut normals,
-                &mut uvs,
-                &mut index_offset
-            );
+                if c_x == CHUNK_SIZE - 1 || matches!(chunk.get(c_x + 1, c_y, c_z).material, BlockMaterial::Empty) {
+                    add_right_face(
+                        x + BLOCK_SIZE,
+                        y,
+                        y + BLOCK_SIZE,
+                        z,
+                        z + BLOCK_SIZE,
+                        &mut vertices,
+                        &mut triangles,
+                        &mut normals,
+                        &mut uvs,
+                        &mut index_offset
+                    );
+                }
+
+                if c_x == 0 || matches!(chunk.get(c_x - 1, c_y, c_z).material, BlockMaterial::Empty) {
+                    add_left_face(
+                        x,
+                        y,
+                        y + BLOCK_SIZE,
+                        z,
+                        z + BLOCK_SIZE,
+                        &mut vertices,
+                        &mut triangles,
+                        &mut normals,
+                        &mut uvs,
+                        &mut index_offset
+                    );
+                }
+                
+                if c_y == CHUNK_SIZE - 1 || matches!(chunk.get(c_x, c_y + 1, c_z).material, BlockMaterial::Empty) {
+                    add_top_face(
+                        x,
+                        x + BLOCK_SIZE,
+                        y + BLOCK_SIZE,
+                        z,
+                        z + BLOCK_SIZE,
+                        &mut vertices,
+                        &mut triangles,
+                        &mut normals,
+                        &mut uvs,
+                        &mut index_offset
+                    );
+                }
+                
+                if c_y == 0 || matches!(chunk.get(c_x, c_y - 1, c_z).material, BlockMaterial::Empty) {
+                    add_bottom_face(
+                        x,
+                        x + BLOCK_SIZE,
+                        y,
+                        z,
+                        z + BLOCK_SIZE,
+                        &mut vertices,
+                        &mut triangles,
+                        &mut normals,
+                        &mut uvs,
+                        &mut index_offset
+                    );
+                }
+                
+                if c_z == CHUNK_SIZE - 1 || matches!(chunk.get(c_x, c_y, c_z + 1).material, BlockMaterial::Empty) {
+                    add_front_face(
+                        x,
+                        x + BLOCK_SIZE,
+                        y,
+                        y + BLOCK_SIZE,
+                        z + BLOCK_SIZE,
+                        &mut vertices,
+                        &mut triangles,
+                        &mut normals,
+                        &mut uvs,
+                        &mut index_offset
+                    );
+                }
+                
+                if c_z == 0 || matches!(chunk.get(c_x, c_y, c_z - 1).material, BlockMaterial::Empty) {
+                    add_back_face(
+                        x,
+                        x + BLOCK_SIZE,
+                        y,
+                        y + BLOCK_SIZE,
+                        z,
+                        &mut vertices,
+                        &mut triangles,
+                        &mut normals,
+                        &mut uvs,
+                        &mut index_offset
+                    );
+                }
+            }
         }
     }
     
@@ -280,22 +296,32 @@ pub fn generate_grid_mesh(grid: &Grid) -> Mesh {
     mesh
 }
 
-pub fn regenerate_grid_meshes(
-    mut grid_changed_events: EventReader<GridChanged>,
+pub fn regenerate_chunk_meshes(
+    mut chunk_changed_events: EventReader<ChunkChanged>,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<StandardMaterial>>,
-    grid_query: Query<&Grid>,
+    grid_query: Query<(&Grid, &Children)>,
+    chunk_query: Query<&ChunkPos>,
     mut commands: Commands,
 ) {
-    for grid_changed in grid_changed_events.read() {
-        let Ok(grid) = grid_query.get(grid_changed.0) else {
+    for chunk_changed in chunk_changed_events.read() {
+        let Ok((grid, children)) = grid_query.get(chunk_changed.grid_entity) else {
             return;
         };
 
-        let mesh = generate_grid_mesh(grid);
-        let mesh_handle = meshes.add(mesh);
-        let material_handle = materials.add(Color::rgb(0.5, 0.5, 0.5).into());
-
-        commands.entity(grid_changed.0).insert((mesh_handle, material_handle));
+        let Some(chunk) = grid.get_chunk(chunk_changed.chunk_pos) else {
+            return;
+        };
+        
+        for &child in children.iter() {
+            if let Ok(&pos) = chunk_query.get(child) {
+                if pos == chunk_changed.chunk_pos {
+                    let mesh = generate_chunk_mesh(chunk);
+                    let mesh_handle = meshes.add(mesh);
+                    commands.entity(child).insert(mesh_handle);
+                    
+                    break;
+                }
+            }
+        }
     }
 }
