@@ -1,18 +1,18 @@
-use bevy::prelude::*;
 use bevy::log::{Level, LogPlugin};
+use bevy::prelude::*;
 use bevy::window::close_on_esc;
 use bevy_inspector_egui::quick::WorldInspectorPlugin;
 use bevy_rapier3d::render::RapierDebugRenderPlugin;
 use big_space::FloatingOriginPlugin;
 
-use crate::UniverseGridPrecision;
 use crate::building_material::BuildingMaterialPlugin;
-use crate::camera::{CameraPlugin, CameraDebugPlugin};
+use crate::camera::{CameraDebugPlugin, CameraPlugin};
 use crate::free_camera::FreeCameraPlugin;
 use crate::grid::plugin::GridPlugin;
 use crate::player::PlayerPlugin;
 use crate::player_controller::PlayerControllerPlugin;
-use crate::settings::{Settings, DebugSettingsPlugin};
+use crate::settings::{DebugSettingsPlugin, Settings};
+use crate::UniverseGridPrecision;
 
 pub trait SetupBevyPlugins {
     fn setup_bevy_plugins(&mut self) -> &mut Self;
@@ -20,10 +20,14 @@ pub trait SetupBevyPlugins {
 
 impl SetupBevyPlugins for App {
     fn setup_bevy_plugins(&mut self) -> &mut Self {
-        self.add_plugins(DefaultPlugins.set(LogPlugin {
-            level: Level::DEBUG,
-            filter: "wgpu=error,naga=error".to_string()
-        }).disable::<TransformPlugin>())
+        self.add_plugins(
+            DefaultPlugins
+                .set(LogPlugin {
+                    level: Level::DEBUG,
+                    filter: "wgpu=error,naga=error".to_string(),
+                })
+                .disable::<TransformPlugin>(),
+        )
         .add_plugins(FloatingOriginPlugin::<UniverseGridPrecision>::default())
     }
 }

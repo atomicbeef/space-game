@@ -1,10 +1,10 @@
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use super::block::{BLOCK_SIZE, BlockMaterial};
+use super::block::{BlockMaterial, BLOCK_SIZE};
 
 use super::chunk::{Chunk, CHUNK_SIZE, CHUNK_SIZE_CUBED};
-use super::{Grid, ChunkChanged, ChunkPos};
+use super::{ChunkChanged, ChunkPos, Grid};
 
 pub fn generate_collider_for_chunk(chunk: &Chunk) -> Collider {
     let mut collider_data: Vec<(Vec3, Quat, Collider)> = Vec::new();
@@ -15,7 +15,7 @@ pub fn generate_collider_for_chunk(chunk: &Chunk) -> Collider {
             for start_x in 0..CHUNK_SIZE {
                 let start_index = chunk.pos_to_index(start_x, start_y, start_z);
                 if tested[start_index] {
-                    continue; 
+                    continue;
                 }
 
                 let block = chunk.get(start_x, start_y, start_z);
@@ -97,9 +97,10 @@ pub fn generate_collider_for_chunk(chunk: &Chunk) -> Collider {
                 let collider = Collider::cuboid(hx, hy, hz);
 
                 collider_data.push((
-                    Vec3::new(start_x as f32, start_y as f32, start_z as f32) * BLOCK_SIZE + Vec3::new(hx, hy, hz),
+                    Vec3::new(start_x as f32, start_y as f32, start_z as f32) * BLOCK_SIZE
+                        + Vec3::new(hx, hy, hz),
                     Quat::IDENTITY,
-                    collider
+                    collider,
                 ));
             }
         }
@@ -122,13 +123,13 @@ pub fn regenerate_chunk_colliders(
         let Some(chunk) = grid.get_chunk(chunk_changed.chunk_pos) else {
             return;
         };
-        
+
         for &child in children.iter() {
             if let Ok(&pos) = chunk_query.get(child) {
                 if pos == chunk_changed.chunk_pos {
                     let collider = generate_collider_for_chunk(chunk);
                     commands.entity(child).insert(collider);
-                    
+
                     break;
                 }
             }

@@ -2,7 +2,7 @@ use bevy::prelude::*;
 
 use space_game::fixed_update::FixedInput;
 
-use crate::scaffolding::{GameTest, FixedUpdate, MockInput};
+use crate::scaffolding::{FixedUpdate, GameTest, MockInput};
 
 mod scaffolding;
 
@@ -14,12 +14,11 @@ fn fixed_input_just_pressed_set() {
 
     app.fixed_update();
 
-    assert!(
-        app.world
-            .get_resource::<FixedInput<MouseButton>>()
-            .unwrap()
-            .just_pressed(MouseButton::Left)
-    );
+    assert!(app
+        .world
+        .get_resource::<FixedInput<MouseButton>>()
+        .unwrap()
+        .just_pressed(MouseButton::Left));
 }
 
 #[test]
@@ -31,12 +30,11 @@ fn fixed_input_just_pressed_cleared() {
     app.fixed_update();
     app.fixed_update();
 
-    assert!(
-        !app.world
-            .get_resource::<FixedInput<MouseButton>>()
-            .unwrap()
-            .just_pressed(MouseButton::Left)
-    );
+    assert!(!app
+        .world
+        .get_resource::<FixedInput<MouseButton>>()
+        .unwrap()
+        .just_pressed(MouseButton::Left));
 }
 
 #[test]
@@ -51,10 +49,9 @@ fn fixed_input_pressed_cleared() {
 
     app.fixed_update();
 
-    assert!(
-        !app.world
-            .get_resource::<FixedInput<MouseButton>>()
-            .unwrap()
-            .pressed(MouseButton::Left)
-    );
+    assert!(!app
+        .world
+        .get_resource::<FixedInput<MouseButton>>()
+        .unwrap()
+        .pressed(MouseButton::Left));
 }

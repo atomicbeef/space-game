@@ -3,7 +3,7 @@ use bevy::render::mesh::{Indices, Mesh, PrimitiveTopology};
 
 use super::block::BlockMaterial;
 use super::chunk::{Chunk, CHUNK_SIZE};
-use super::{Grid, ChunkPos, ChunkChanged};
+use super::{ChunkChanged, ChunkPos, Grid};
 use crate::grid::block::BLOCK_SIZE;
 
 fn add_right_face(
@@ -16,7 +16,7 @@ fn add_right_face(
     triangles: &mut Vec<u32>,
     normals: &mut Vec<[f32; 3]>,
     uvs: &mut Vec<[f32; 2]>,
-    index_offset: &mut u32
+    index_offset: &mut u32,
 ) {
     let verts = &[
         ([x, min_y, min_z], [1.0, 0., 0.], [0., 0.]),
@@ -30,7 +30,12 @@ fn add_right_face(
     uvs.extend(verts.iter().map(|(_, _, uv)| *uv));
 
     triangles.extend([
-        *index_offset, *index_offset + 1, *index_offset + 2, *index_offset + 2, *index_offset + 3, *index_offset
+        *index_offset,
+        *index_offset + 1,
+        *index_offset + 2,
+        *index_offset + 2,
+        *index_offset + 3,
+        *index_offset,
     ]);
     *index_offset += 4;
 }
@@ -45,7 +50,7 @@ fn add_left_face(
     triangles: &mut Vec<u32>,
     normals: &mut Vec<[f32; 3]>,
     uvs: &mut Vec<[f32; 2]>,
-    index_offset: &mut u32
+    index_offset: &mut u32,
 ) {
     let verts = &[
         ([x, min_y, max_z], [-1.0, 0., 0.], [1.0, 0.]),
@@ -59,7 +64,12 @@ fn add_left_face(
     uvs.extend(verts.iter().map(|(_, _, uv)| *uv));
 
     triangles.extend([
-        *index_offset, *index_offset + 1, *index_offset + 2, *index_offset + 2, *index_offset + 3, *index_offset
+        *index_offset,
+        *index_offset + 1,
+        *index_offset + 2,
+        *index_offset + 2,
+        *index_offset + 3,
+        *index_offset,
     ]);
     *index_offset += 4;
 }
@@ -74,7 +84,7 @@ fn add_top_face(
     triangles: &mut Vec<u32>,
     normals: &mut Vec<[f32; 3]>,
     uvs: &mut Vec<[f32; 2]>,
-    index_offset: &mut u32
+    index_offset: &mut u32,
 ) {
     let verts = &[
         ([max_x, y, min_z], [0., 1.0, 0.], [1.0, 0.]),
@@ -88,7 +98,12 @@ fn add_top_face(
     uvs.extend(verts.iter().map(|(_, _, uv)| *uv));
 
     triangles.extend([
-        *index_offset, *index_offset + 1, *index_offset + 2, *index_offset + 2, *index_offset + 3, *index_offset
+        *index_offset,
+        *index_offset + 1,
+        *index_offset + 2,
+        *index_offset + 2,
+        *index_offset + 3,
+        *index_offset,
     ]);
     *index_offset += 4;
 }
@@ -103,7 +118,7 @@ fn add_bottom_face(
     triangles: &mut Vec<u32>,
     normals: &mut Vec<[f32; 3]>,
     uvs: &mut Vec<[f32; 2]>,
-    index_offset: &mut u32
+    index_offset: &mut u32,
 ) {
     let verts = &[
         ([max_x, y, max_z], [0., -1.0, 0.], [0., 0.]),
@@ -117,7 +132,12 @@ fn add_bottom_face(
     uvs.extend(verts.iter().map(|(_, _, uv)| *uv));
 
     triangles.extend([
-        *index_offset, *index_offset + 1, *index_offset + 2, *index_offset + 2, *index_offset + 3, *index_offset
+        *index_offset,
+        *index_offset + 1,
+        *index_offset + 2,
+        *index_offset + 2,
+        *index_offset + 3,
+        *index_offset,
     ]);
     *index_offset += 4;
 }
@@ -132,7 +152,7 @@ fn add_front_face(
     triangles: &mut Vec<u32>,
     normals: &mut Vec<[f32; 3]>,
     uvs: &mut Vec<[f32; 2]>,
-    index_offset: &mut u32
+    index_offset: &mut u32,
 ) {
     let verts = &[
         ([min_x, min_y, z], [0., 0., 1.0], [0., 0.]),
@@ -146,7 +166,12 @@ fn add_front_face(
     uvs.extend(verts.iter().map(|(_, _, uv)| *uv));
 
     triangles.extend([
-        *index_offset, *index_offset + 1, *index_offset + 2, *index_offset + 2, *index_offset + 3, *index_offset
+        *index_offset,
+        *index_offset + 1,
+        *index_offset + 2,
+        *index_offset + 2,
+        *index_offset + 3,
+        *index_offset,
     ]);
     *index_offset += 4;
 }
@@ -161,7 +186,7 @@ fn add_back_face(
     triangles: &mut Vec<u32>,
     normals: &mut Vec<[f32; 3]>,
     uvs: &mut Vec<[f32; 2]>,
-    index_offset: &mut u32
+    index_offset: &mut u32,
 ) {
     let verts = &[
         ([min_x, max_y, z], [0., 0., -1.0], [1.0, 0.]),
@@ -175,7 +200,12 @@ fn add_back_face(
     uvs.extend(verts.iter().map(|(_, _, uv)| *uv));
 
     triangles.extend([
-        *index_offset, *index_offset + 1, *index_offset + 2, *index_offset + 2, *index_offset + 3, *index_offset
+        *index_offset,
+        *index_offset + 1,
+        *index_offset + 2,
+        *index_offset + 2,
+        *index_offset + 3,
+        *index_offset,
     ]);
     *index_offset += 4;
 }
@@ -194,7 +224,9 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                 let y = c_y as f32 * BLOCK_SIZE;
                 let z = c_z as f32 * BLOCK_SIZE;
 
-                if c_x == CHUNK_SIZE - 1 || matches!(chunk.get(c_x + 1, c_y, c_z).material, BlockMaterial::Empty) {
+                if c_x == CHUNK_SIZE - 1
+                    || matches!(chunk.get(c_x + 1, c_y, c_z).material, BlockMaterial::Empty)
+                {
                     add_right_face(
                         x + BLOCK_SIZE,
                         y,
@@ -205,11 +237,12 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                         &mut triangles,
                         &mut normals,
                         &mut uvs,
-                        &mut index_offset
+                        &mut index_offset,
                     );
                 }
 
-                if c_x == 0 || matches!(chunk.get(c_x - 1, c_y, c_z).material, BlockMaterial::Empty) {
+                if c_x == 0 || matches!(chunk.get(c_x - 1, c_y, c_z).material, BlockMaterial::Empty)
+                {
                     add_left_face(
                         x,
                         y,
@@ -220,11 +253,13 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                         &mut triangles,
                         &mut normals,
                         &mut uvs,
-                        &mut index_offset
+                        &mut index_offset,
                     );
                 }
-                
-                if c_y == CHUNK_SIZE - 1 || matches!(chunk.get(c_x, c_y + 1, c_z).material, BlockMaterial::Empty) {
+
+                if c_y == CHUNK_SIZE - 1
+                    || matches!(chunk.get(c_x, c_y + 1, c_z).material, BlockMaterial::Empty)
+                {
                     add_top_face(
                         x,
                         x + BLOCK_SIZE,
@@ -235,11 +270,12 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                         &mut triangles,
                         &mut normals,
                         &mut uvs,
-                        &mut index_offset
+                        &mut index_offset,
                     );
                 }
-                
-                if c_y == 0 || matches!(chunk.get(c_x, c_y - 1, c_z).material, BlockMaterial::Empty) {
+
+                if c_y == 0 || matches!(chunk.get(c_x, c_y - 1, c_z).material, BlockMaterial::Empty)
+                {
                     add_bottom_face(
                         x,
                         x + BLOCK_SIZE,
@@ -250,11 +286,13 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                         &mut triangles,
                         &mut normals,
                         &mut uvs,
-                        &mut index_offset
+                        &mut index_offset,
                     );
                 }
-                
-                if c_z == CHUNK_SIZE - 1 || matches!(chunk.get(c_x, c_y, c_z + 1).material, BlockMaterial::Empty) {
+
+                if c_z == CHUNK_SIZE - 1
+                    || matches!(chunk.get(c_x, c_y, c_z + 1).material, BlockMaterial::Empty)
+                {
                     add_front_face(
                         x,
                         x + BLOCK_SIZE,
@@ -265,11 +303,12 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                         &mut triangles,
                         &mut normals,
                         &mut uvs,
-                        &mut index_offset
+                        &mut index_offset,
                     );
                 }
-                
-                if c_z == 0 || matches!(chunk.get(c_x, c_y, c_z - 1).material, BlockMaterial::Empty) {
+
+                if c_z == 0 || matches!(chunk.get(c_x, c_y, c_z - 1).material, BlockMaterial::Empty)
+                {
                     add_back_face(
                         x,
                         x + BLOCK_SIZE,
@@ -280,13 +319,13 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                         &mut triangles,
                         &mut normals,
                         &mut uvs,
-                        &mut index_offset
+                        &mut index_offset,
                     );
                 }
             }
         }
     }
-    
+
     let mut mesh = Mesh::new(PrimitiveTopology::TriangleList);
     mesh.insert_attribute(Mesh::ATTRIBUTE_POSITION, vertices);
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
@@ -311,14 +350,14 @@ pub fn regenerate_chunk_meshes(
         let Some(chunk) = grid.get_chunk(chunk_changed.chunk_pos) else {
             return;
         };
-        
+
         for &child in children.iter() {
             if let Ok(&pos) = chunk_query.get(child) {
                 if pos == chunk_changed.chunk_pos {
                     let mesh = generate_chunk_mesh(chunk);
                     let mesh_handle = meshes.add(mesh);
                     commands.entity(child).insert(mesh_handle);
-                    
+
                     break;
                 }
             }

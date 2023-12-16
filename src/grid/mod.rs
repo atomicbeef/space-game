@@ -47,10 +47,10 @@ impl Grid {
         match chunk {
             Some(chunk) => {
                 self.chunks.insert(pos, chunk);
-            },
+            }
             None => {
                 self.chunks.remove(&pos);
-            },
+            }
         }
     }
 }

@@ -1,20 +1,20 @@
 use std::time::Duration;
 
+use bevy::diagnostic::DiagnosticsPlugin;
 use bevy::input::keyboard::KeyboardInput;
 use bevy::input::mouse::MouseButtonInput;
-use bevy::prelude::*;
-use bevy::log::{LogPlugin, Level};
-use bevy::diagnostic::DiagnosticsPlugin; 
-use bevy::render::settings::RenderCreation;
-use bevy::render::{RenderPlugin, settings::WgpuSettings};
-use bevy::scene::ScenePlugin;
-use bevy::input::{InputPlugin, ButtonState};
+use bevy::input::{ButtonState, InputPlugin};
+use bevy::log::{Level, LogPlugin};
 use bevy::pbr::PbrPlugin;
+use bevy::prelude::*;
+use bevy::render::settings::RenderCreation;
+use bevy::render::{settings::WgpuSettings, RenderPlugin};
+use bevy::scene::ScenePlugin;
 
-use big_space::{FloatingOriginPlugin, FloatingOrigin};
+use big_space::{FloatingOrigin, FloatingOriginPlugin};
 use space_game::app_setup::{SetupGame, SetupMaterials};
-use space_game::fixed_update::{SetupFixedTimeStepSchedule, SetupRapier, FixedUpdateSet};
-use space_game::{PHYSICS_TIMESTEP, UniverseGrid, UniverseGridPrecision};
+use space_game::fixed_update::{FixedUpdateSet, SetupFixedTimeStepSchedule, SetupRapier};
+use space_game::{UniverseGrid, UniverseGridPrecision, PHYSICS_TIMESTEP};
 
 pub trait SetupBevyPlugins {
     fn setup_bevy_plugins(&mut self) -> &mut Self;
@@ -37,7 +37,7 @@ impl SetupBevyPlugins for App {
             ImagePlugin::default(),
             LogPlugin {
                 level: Level::ERROR,
-                filter: "wgpu=error,naga=error".to_string()
+                filter: "wgpu=error,naga=error".to_string(),
             },
             InputPlugin,
             WindowPlugin {
@@ -46,7 +46,7 @@ impl SetupBevyPlugins for App {
                 ..Default::default()
             },
             PbrPlugin::default(),
-            FloatingOriginPlugin::<UniverseGridPrecision>::default()
+            FloatingOriginPlugin::<UniverseGridPrecision>::default(),
         ))
     }
 }
@@ -102,37 +102,49 @@ pub trait MockInput {
 
 impl MockInput for App {
     fn mock_key_press(&mut self, key: KeyCode) {
-        self.world.get_resource_mut::<Events<KeyboardInput>>().unwrap().send(KeyboardInput {
-            scan_code: 0,
-            key_code: Some(key),
-            state: ButtonState::Pressed,
-            window: Entity::PLACEHOLDER,
-        });
+        self.world
+            .get_resource_mut::<Events<KeyboardInput>>()
+            .unwrap()
+            .send(KeyboardInput {
+                scan_code: 0,
+                key_code: Some(key),
+                state: ButtonState::Pressed,
+                window: Entity::PLACEHOLDER,
+            });
     }
 
     fn mock_key_release(&mut self, key: KeyCode) {
-        self.world.get_resource_mut::<Events<KeyboardInput>>().unwrap().send(KeyboardInput {
-            scan_code: 0,
-            key_code: Some(key),
-            state: ButtonState::Released,
-            window: Entity::PLACEHOLDER,
-        });
+        self.world
+            .get_resource_mut::<Events<KeyboardInput>>()
+            .unwrap()
+            .send(KeyboardInput {
+                scan_code: 0,
+                key_code: Some(key),
+                state: ButtonState::Released,
+                window: Entity::PLACEHOLDER,
+            });
     }
 
     fn mock_mouse_button_press(&mut self, button: MouseButton) {
-        self.world.get_resource_mut::<Events<MouseButtonInput>>().unwrap().send(MouseButtonInput {
-            button,
-            state: ButtonState::Pressed,
-            window: Entity::PLACEHOLDER,
-        });
+        self.world
+            .get_resource_mut::<Events<MouseButtonInput>>()
+            .unwrap()
+            .send(MouseButtonInput {
+                button,
+                state: ButtonState::Pressed,
+                window: Entity::PLACEHOLDER,
+            });
     }
 
     fn mock_mouse_button_release(&mut self, button: MouseButton) {
-        self.world.get_resource_mut::<Events<MouseButtonInput>>().unwrap().send(MouseButtonInput {
-            button,
-            state: ButtonState::Released,
-            window: Entity::PLACEHOLDER,
-        });
+        self.world
+            .get_resource_mut::<Events<MouseButtonInput>>()
+            .unwrap()
+            .send(MouseButtonInput {
+                button,
+                state: ButtonState::Released,
+                window: Entity::PLACEHOLDER,
+            });
     }
 }
 

@@ -1,20 +1,23 @@
 use bevy::prelude::*;
-use bevy::window::{PrimaryWindow, CursorGrabMode};
+use bevy::window::{CursorGrabMode, PrimaryWindow};
 use bevy_rapier3d::prelude::*;
 
 use crate::camera::ActiveCamera;
-use crate::fixed_update::{FixedUpdateSet, FixedInput, FixedMouseMotion};
+use crate::fixed_update::{FixedInput, FixedMouseMotion, FixedUpdateSet};
 use crate::player::Player;
 use crate::player_camera::PlayerCamera;
-use crate::PHYSICS_TIMESTEP;
 use crate::settings::Settings;
+use crate::PHYSICS_TIMESTEP;
 
 #[derive(Component)]
 pub struct ActivelyControlled;
 
 fn player_movement(
     keys: Res<FixedInput<KeyCode>>,
-    mut player_data_query: Query<(&mut ExternalImpulse, &Transform), (With<Player>, With<ActivelyControlled>)>,
+    mut player_data_query: Query<
+        (&mut ExternalImpulse, &Transform),
+        (With<Player>, With<ActivelyControlled>),
+    >,
     mut motion_reader: EventReader<FixedMouseMotion>,
     primary_window_query: Query<&Window, With<PrimaryWindow>>,
     settings: Res<Settings>,
@@ -26,10 +29,10 @@ fn player_movement(
     let Ok(window) = primary_window_query.get_single() else {
         return;
     };
-    
+
     if matches!(window.cursor.grab_mode, CursorGrabMode::None) {
         return;
-    } 
+    }
 
     let mut move_direction = Vec3::default();
     let mut rotate_vector = Vec3::default();
@@ -69,8 +72,15 @@ fn player_movement(
     let scale_factor = window.height().min(window.width());
 
     for motion in motion_reader.read() {
-        rotate_vector += player_transform.left() * motion.delta.y * settings.first_person_sensitivity * scale_factor * 12.5;
-        rotate_vector += player_transform.down() * motion.delta.x * settings.first_person_sensitivity * scale_factor;
+        rotate_vector += player_transform.left()
+            * motion.delta.y
+            * settings.first_person_sensitivity
+            * scale_factor
+            * 12.5;
+        rotate_vector += player_transform.down()
+            * motion.delta.x
+            * settings.first_person_sensitivity
+            * scale_factor;
     }
 
     external_impulse.impulse = move_direction.normalize_or_zero() * PHYSICS_TIMESTEP * 50.0;
@@ -91,9 +101,9 @@ fn cursor_lock(
         if keys.just_pressed(KeyCode::Tab) {
             let cursor_locked = match window.cursor.grab_mode {
                 CursorGrabMode::None => false,
-                CursorGrabMode::Confined | CursorGrabMode::Locked => true
+                CursorGrabMode::Confined | CursorGrabMode::Locked => true,
             };
-            
+
             if !cursor_locked {
                 window.cursor.grab_mode = CursorGrabMode::Confined;
                 window.cursor.visible = false;
@@ -109,9 +119,9 @@ pub struct PlayerControllerPlugin;
 
 impl Plugin for PlayerControllerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(FixedUpdate, (
-            cursor_lock,
-            player_movement,
-        ).in_set(FixedUpdateSet::Update));
+        app.add_systems(
+            FixedUpdate,
+            (cursor_lock, player_movement).in_set(FixedUpdateSet::Update),
+        );
     }
 }

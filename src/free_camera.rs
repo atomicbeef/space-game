@@ -3,9 +3,9 @@ use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 
 use crate::camera::ActiveCamera;
+use crate::fixed_update::FixedUpdateSet;
 use crate::fixed_update::{FixedInput, FixedMouseMotion};
 use crate::settings::Settings;
-use crate::fixed_update::FixedUpdateSet;
 use crate::PHYSICS_TIMESTEP;
 
 #[derive(Component)]
@@ -48,11 +48,13 @@ fn camera_rotate(
         for mut transform in camera_query.iter_mut() {
             for ev in motion_evr.read() {
                 match window.cursor.grab_mode {
-                    CursorGrabMode::None => {},
+                    CursorGrabMode::None => {}
                     CursorGrabMode::Confined | CursorGrabMode::Locked => {
                         let scale_factor = window.height().min(window.width());
-                        let pitch = (settings.free_camera_sensitivity * ev.delta.y * scale_factor).to_radians();
-                        let yaw = (settings.free_camera_sensitivity * ev.delta.x * scale_factor).to_radians();
+                        let pitch = (settings.free_camera_sensitivity * ev.delta.y * scale_factor)
+                            .to_radians();
+                        let yaw = (settings.free_camera_sensitivity * ev.delta.x * scale_factor)
+                            .to_radians();
 
                         transform.rotate_y(-yaw);
                         transform.rotate_local_x(-pitch);
@@ -66,7 +68,7 @@ fn camera_rotate(
 fn cursor_grab(
     mouse_button_input: Res<FixedInput<MouseButton>>,
     mut primary_window_query: Query<&mut Window, With<PrimaryWindow>>,
-    free_camera_query: Query<(), (With<ActiveCamera>, With<FreeCamera>)>
+    free_camera_query: Query<(), (With<ActiveCamera>, With<FreeCamera>)>,
 ) {
     // Only manage the cursor if the active camera is a free camera
     let Ok(_) = free_camera_query.get_single() else {
@@ -79,9 +81,9 @@ fn cursor_grab(
         let rmb_pressed = mouse_button_input.pressed(MouseButton::Right);
         let cursor_locked = match window.cursor.grab_mode {
             CursorGrabMode::None => false,
-            CursorGrabMode::Confined | CursorGrabMode::Locked => true
+            CursorGrabMode::Confined | CursorGrabMode::Locked => true,
         };
-        
+
         if rmb_pressed && !cursor_locked {
             window.cursor.grab_mode = CursorGrabMode::Confined;
             window.cursor.visible = false;
@@ -96,10 +98,9 @@ pub struct FreeCameraPlugin;
 
 impl Plugin for FreeCameraPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(FixedUpdate, (
-            camera_move,
-            camera_rotate,
-            cursor_grab
-        ).in_set(FixedUpdateSet::Update));
+        app.add_systems(
+            FixedUpdate,
+            (camera_move, camera_rotate, cursor_grab).in_set(FixedUpdateSet::Update),
+        );
     }
 }

@@ -12,9 +12,7 @@ pub struct Chunk {
 
 impl Chunk {
     pub fn new(blocks: [Block; CHUNK_SIZE_CUBED]) -> Self {
-        Self {
-            blocks,
-        }
+        Self { blocks }
     }
 
     pub fn pos_to_index(&self, x: u8, y: u8, z: u8) -> usize {

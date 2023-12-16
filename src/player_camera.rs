@@ -14,7 +14,10 @@ impl PlayerCameraBundle {
         Self {
             camera: Camera3dBundle {
                 transform,
-                camera: Camera { is_active: false, ..Default::default() },
+                camera: Camera {
+                    is_active: false,
+                    ..Default::default()
+                },
                 ..Default::default()
             },
             player_camera: PlayerCamera,

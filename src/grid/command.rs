@@ -1,14 +1,14 @@
-use bevy::prelude::*;
 use bevy::ecs::system::{Command, SystemState};
+use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::UniverseGrid;
 use crate::building_material::BuildingMaterialHandle;
+use crate::UniverseGrid;
 
-use super::Grid;
 use super::block::BLOCK_SIZE;
 use super::collider::generate_collider_for_chunk;
 use super::mesh::generate_chunk_mesh;
+use super::Grid;
 
 pub struct SpawnGrid {
     pub transform: Transform,
@@ -23,11 +23,7 @@ impl Command for SpawnGrid {
             Commands,
         )> = SystemState::new(world);
 
-        let (
-            mut meshes,
-            material_handle,
-            mut commands,
-        ) = system_state.get_mut(world);
+        let (mut meshes, material_handle, mut commands) = system_state.get_mut(world);
 
         let mut chunk_entities = Vec::with_capacity(self.grid.chunks.len());
 
@@ -75,9 +71,6 @@ impl Command for SpawnGrid {
 
 impl SpawnGrid {
     pub fn new(transform: Transform, grid: Grid) -> Self {
-        Self {
-            transform,
-            grid,
-        }
+        Self { transform, grid }
     }
 }
