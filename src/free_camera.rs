@@ -1,10 +1,10 @@
 use bevy::ecs::event::EventReader;
+use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 
 use crate::camera::ActiveCamera;
-use crate::fixed_update::FixedUpdateSet;
-use crate::fixed_update::{FixedInput, FixedMouseMotion};
+use crate::fixed_update::{FixedInput, FixedUpdateSet};
 use crate::settings::Settings;
 use crate::PHYSICS_TIMESTEP;
 
@@ -38,13 +38,18 @@ fn camera_move(
 }
 
 fn camera_rotate(
-    mut motion_evr: EventReader<FixedMouseMotion>,
+    mut motion_evr: EventReader<MouseMotion>,
     primary_window_query: Query<&Window, With<PrimaryWindow>>,
     settings: Res<Settings>,
     mut camera_query: Query<&mut Transform, (With<ActiveCamera>, With<FreeCamera>)>,
 ) {
     let primary_window = primary_window_query.get_single();
     if let Ok(window) = primary_window {
+        if camera_query.iter().count() == 0 {
+            motion_evr.clear();
+            return;
+        }
+
         for mut transform in camera_query.iter_mut() {
             for ev in motion_evr.read() {
                 match window.cursor.grab_mode {

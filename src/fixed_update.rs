@@ -1,7 +1,7 @@
 use std::hash::Hash;
 use std::marker::PhantomData;
 
-use bevy::input::{mouse::MouseMotion, InputSystem};
+use bevy::input::InputSystem;
 use bevy::prelude::*;
 use bevy::transform::TransformSystem;
 use bevy_rapier3d::prelude::*;
@@ -102,38 +102,6 @@ impl<T> Default for Flag<T> {
     }
 }
 
-fn set_update_events<T: Event>(mut update_events_flag: ResMut<Flag<Events<T>>>) {
-    update_events_flag.enabled = true;
-}
-
-fn update_events<T: Event>(
-    mut update_events_flag: ResMut<Flag<Events<T>>>,
-    mut events: ResMut<Events<T>>,
-) {
-    if update_events_flag.enabled {
-        events.update();
-        update_events_flag.enabled = false;
-    }
-}
-
-pub trait AddFixedEvent {
-    fn add_fixed_event<T: Event>(&mut self) -> &mut Self;
-}
-
-impl AddFixedEvent for App {
-    fn add_fixed_event<T: Event>(&mut self) -> &mut Self {
-        self.init_resource::<Flag<Events<T>>>()
-            .init_resource::<Events<T>>()
-            .add_systems(
-                FixedUpdate,
-                (
-                    set_update_events::<T>.in_set(FixedUpdateSet::PreUpdate),
-                    update_events::<T>.in_set(FixedUpdateSet::Last),
-                ),
-            )
-    }
-}
-
 #[derive(Debug, Clone, Resource, Reflect, Deref, DerefMut)]
 pub struct FixedInput<T: Copy + Eq + Hash + Send + Sync + 'static>(Input<T>);
 
@@ -178,18 +146,6 @@ fn clear_fixed_input<T: Copy + Eq + Hash + Send + Sync + 'static>(
     flag.enabled = false;
 }
 
-#[derive(Debug, Clone, Resource, Reflect, Deref, DerefMut, Event)]
-pub struct FixedMouseMotion(MouseMotion);
-
-fn send_fixed_mouse_motion_events(
-    mut mouse_motion_reader: EventReader<MouseMotion>,
-    mut fixed_mouse_motion_wrier: EventWriter<FixedMouseMotion>,
-) {
-    for event in mouse_motion_reader.read() {
-        fixed_mouse_motion_wrier.send(FixedMouseMotion(*event));
-    }
-}
-
 #[derive(SystemSet, Debug, Hash, PartialEq, Eq, Clone)]
 pub struct FixedInputSystem;
 
@@ -212,10 +168,5 @@ impl Plugin for FixedInputPlugin {
         add_fixed_input::<ScanCode>(app);
         add_fixed_input::<MouseButton>(app);
         add_fixed_input::<GamepadButton>(app);
-        app.add_fixed_event::<FixedMouseMotion>();
-        app.add_systems(
-            FixedUpdate,
-            send_fixed_mouse_motion_events.in_set(FixedInputSystem),
-        );
     }
 }

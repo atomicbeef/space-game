@@ -6,7 +6,6 @@ use bevy_rapier3d::prelude::*;
 use big_space::FloatingOrigin;
 
 use crate::camera::ActiveCamera;
-use crate::fixed_update::AddFixedEvent;
 use crate::fixed_update::FixedUpdateSet;
 use crate::player_controller::ActivelyControlled;
 use crate::{
@@ -145,7 +144,7 @@ pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_fixed_event::<PlayerSpawned>().add_systems(
+        app.add_event::<PlayerSpawned>().add_systems(
             FixedUpdate,
             control_newly_spawned_player.in_set(FixedUpdateSet::Update),
         );

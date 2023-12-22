@@ -1,9 +1,10 @@
+use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
 use bevy_rapier3d::prelude::*;
 
 use crate::camera::ActiveCamera;
-use crate::fixed_update::{FixedInput, FixedMouseMotion, FixedUpdateSet};
+use crate::fixed_update::{FixedInput, FixedUpdateSet};
 use crate::player::Player;
 use crate::player_camera::PlayerCamera;
 use crate::settings::Settings;
@@ -18,19 +19,22 @@ fn player_movement(
         (&mut ExternalImpulse, &Transform),
         (With<Player>, With<ActivelyControlled>),
     >,
-    mut motion_reader: EventReader<FixedMouseMotion>,
+    mut motion_reader: EventReader<MouseMotion>,
     primary_window_query: Query<&Window, With<PrimaryWindow>>,
     settings: Res<Settings>,
 ) {
     let Ok((mut external_impulse, player_transform)) = player_data_query.get_single_mut() else {
+        motion_reader.clear();
         return;
     };
 
     let Ok(window) = primary_window_query.get_single() else {
+        motion_reader.clear();
         return;
     };
 
     if matches!(window.cursor.grab_mode, CursorGrabMode::None) {
+        motion_reader.clear();
         return;
     }
 
