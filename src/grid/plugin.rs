@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
+use super::chunk::ChunkChanged;
 use super::collider::regenerate_chunk_colliders;
 use super::mesh::regenerate_chunk_meshes;
-use super::ChunkChanged;
 
 pub struct GridPlugin;
 

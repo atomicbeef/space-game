@@ -151,7 +151,7 @@ fn draw_reticle(
         return;
     };
 
-    if matches!(window.cursor.grab_mode, CursorGrabMode::None) {
+    if window.cursor.grab_mode == CursorGrabMode::None {
         return;
     }
 

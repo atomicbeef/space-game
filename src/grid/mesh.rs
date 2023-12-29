@@ -1,9 +1,10 @@
 use bevy::prelude::*;
 use bevy::render::mesh::{Indices, Mesh, PrimitiveTopology};
+use bevy::render::primitives::Aabb;
 
 use super::block::BlockMaterial;
-use super::chunk::{Chunk, CHUNK_SIZE};
-use super::{ChunkChanged, ChunkPos, Grid};
+use super::chunk::{Chunk, ChunkChanged, CHUNK_SIZE};
+use super::{ChunkPos, Grid};
 use crate::grid::block::BLOCK_SIZE;
 
 fn add_right_face(
@@ -220,12 +221,16 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
     for c_z in 0..CHUNK_SIZE {
         for c_y in 0..CHUNK_SIZE {
             for c_x in 0..CHUNK_SIZE {
+                if chunk.get(c_x, c_y, c_z).material == BlockMaterial::Empty {
+                    continue;
+                }
+
                 let x = c_x as f32 * BLOCK_SIZE;
                 let y = c_y as f32 * BLOCK_SIZE;
                 let z = c_z as f32 * BLOCK_SIZE;
 
                 if c_x == CHUNK_SIZE - 1
-                    || matches!(chunk.get(c_x + 1, c_y, c_z).material, BlockMaterial::Empty)
+                    || chunk.get(c_x + 1, c_y, c_z).material == BlockMaterial::Empty
                 {
                     add_right_face(
                         x + BLOCK_SIZE,
@@ -241,8 +246,7 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                     );
                 }
 
-                if c_x == 0 || matches!(chunk.get(c_x - 1, c_y, c_z).material, BlockMaterial::Empty)
-                {
+                if c_x == 0 || chunk.get(c_x - 1, c_y, c_z).material == BlockMaterial::Empty {
                     add_left_face(
                         x,
                         y,
@@ -258,7 +262,7 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                 }
 
                 if c_y == CHUNK_SIZE - 1
-                    || matches!(chunk.get(c_x, c_y + 1, c_z).material, BlockMaterial::Empty)
+                    || chunk.get(c_x, c_y + 1, c_z).material == BlockMaterial::Empty
                 {
                     add_top_face(
                         x,
@@ -274,8 +278,7 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                     );
                 }
 
-                if c_y == 0 || matches!(chunk.get(c_x, c_y - 1, c_z).material, BlockMaterial::Empty)
-                {
+                if c_y == 0 || chunk.get(c_x, c_y - 1, c_z).material == BlockMaterial::Empty {
                     add_bottom_face(
                         x,
                         x + BLOCK_SIZE,
@@ -291,7 +294,7 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                 }
 
                 if c_z == CHUNK_SIZE - 1
-                    || matches!(chunk.get(c_x, c_y, c_z + 1).material, BlockMaterial::Empty)
+                    || chunk.get(c_x, c_y, c_z + 1).material == BlockMaterial::Empty
                 {
                     add_front_face(
                         x,
@@ -307,8 +310,7 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
                     );
                 }
 
-                if c_z == 0 || matches!(chunk.get(c_x, c_y, c_z - 1).material, BlockMaterial::Empty)
-                {
+                if c_z == 0 || chunk.get(c_x, c_y, c_z - 1).material == BlockMaterial::Empty {
                     add_back_face(
                         x,
                         x + BLOCK_SIZE,
@@ -338,29 +340,30 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
 pub fn regenerate_chunk_meshes(
     mut chunk_changed_events: EventReader<ChunkChanged>,
     mut meshes: ResMut<Assets<Mesh>>,
-    grid_query: Query<(&Grid, &Children)>,
-    chunk_query: Query<&ChunkPos>,
+    chunk_query: Query<(&ChunkPos, &Parent)>,
+    grid_query: Query<&Grid>,
     mut commands: Commands,
 ) {
     for chunk_changed in chunk_changed_events.read() {
-        let Ok((grid, children)) = grid_query.get(chunk_changed.grid_entity) else {
+        let Ok((chunk_pos, parent)) = chunk_query.get(chunk_changed.0) else {
+            continue;
+        };
+
+        let grid_entity = parent.get();
+
+        let Ok(grid) = grid_query.get(grid_entity) else {
             return;
         };
 
-        let Some(chunk) = grid.get_chunk(chunk_changed.chunk_pos) else {
+        let Some(chunk) = grid.get_chunk(*chunk_pos) else {
             return;
         };
 
-        for &child in children.iter() {
-            if let Ok(&pos) = chunk_query.get(child) {
-                if pos == chunk_changed.chunk_pos {
-                    let mesh = generate_chunk_mesh(chunk);
-                    let mesh_handle = meshes.add(mesh);
-                    commands.entity(child).insert(mesh_handle);
-
-                    break;
-                }
-            }
-        }
+        let mesh = generate_chunk_mesh(chunk);
+        let mesh_handle = meshes.add(mesh);
+        commands
+            .entity(chunk_changed.0)
+            .insert(mesh_handle)
+            .remove::<Aabb>();
     }
 }

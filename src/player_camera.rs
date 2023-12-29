@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use crate::raycast_selection::SelectionSource;
+
 #[derive(Component)]
 pub struct PlayerCamera;
 
@@ -7,6 +9,7 @@ pub struct PlayerCamera;
 pub struct PlayerCameraBundle {
     pub camera: Camera3dBundle,
     pub player_camera: PlayerCamera,
+    pub selection_source: SelectionSource,
 }
 
 impl PlayerCameraBundle {
@@ -21,6 +24,7 @@ impl PlayerCameraBundle {
                 ..Default::default()
             },
             player_camera: PlayerCamera,
+            selection_source: SelectionSource::new(),
         }
     }
 }

@@ -3,8 +3,8 @@ use bevy_rapier3d::prelude::*;
 
 use super::block::{BlockMaterial, BLOCK_SIZE};
 
-use super::chunk::{Chunk, CHUNK_SIZE, CHUNK_SIZE_CUBED};
-use super::{ChunkChanged, ChunkPos, Grid};
+use super::chunk::{Chunk, ChunkChanged, CHUNK_SIZE, CHUNK_SIZE_CUBED};
+use super::{ChunkPos, Grid};
 
 pub fn generate_collider_for_chunk(chunk: &Chunk) -> Collider {
     let mut collider_data: Vec<(Vec3, Quat, Collider)> = Vec::new();
@@ -20,7 +20,7 @@ pub fn generate_collider_for_chunk(chunk: &Chunk) -> Collider {
 
                 let block = chunk.get(start_x, start_y, start_z);
 
-                if matches!(block.material, BlockMaterial::Empty) {
+                if block.material == BlockMaterial::Empty {
                     tested[start_index] = true;
                     continue;
                 }
@@ -111,28 +111,27 @@ pub fn generate_collider_for_chunk(chunk: &Chunk) -> Collider {
 
 pub fn regenerate_chunk_colliders(
     mut chunk_changed_events: EventReader<ChunkChanged>,
-    grid_query: Query<(&Grid, &Children)>,
-    chunk_query: Query<&ChunkPos>,
+    chunk_query: Query<(&ChunkPos, &Parent)>,
+    grid_query: Query<&Grid>,
     mut commands: Commands,
 ) {
     for chunk_changed in chunk_changed_events.read() {
-        let Ok((grid, children)) = grid_query.get(chunk_changed.grid_entity) else {
+        let Ok((chunk_pos, parent)) = chunk_query.get(chunk_changed.0) else {
+            continue;
+        };
+
+        let grid_entity = parent.get();
+
+        let Ok(grid) = grid_query.get(grid_entity) else {
             return;
         };
 
-        let Some(chunk) = grid.get_chunk(chunk_changed.chunk_pos) else {
+        let Some(chunk) = grid.get_chunk(*chunk_pos) else {
             return;
         };
 
-        for &child in children.iter() {
-            if let Ok(&pos) = chunk_query.get(child) {
-                if pos == chunk_changed.chunk_pos {
-                    let collider = generate_collider_for_chunk(chunk);
-                    commands.entity(child).insert(collider);
-
-                    break;
-                }
-            }
-        }
+        commands
+            .entity(chunk_changed.0)
+            .insert(generate_collider_for_chunk(chunk));
     }
 }
