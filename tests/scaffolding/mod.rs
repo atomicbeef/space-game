@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use bevy::diagnostic::DiagnosticsPlugin;
+use bevy::gizmos::GizmoPlugin;
 use bevy::input::keyboard::KeyboardInput;
 use bevy::input::mouse::MouseButtonInput;
 use bevy::input::{ButtonState, InputPlugin};
@@ -47,6 +48,7 @@ impl SetupBevyPlugins for App {
             },
             PbrPlugin::default(),
             FloatingOriginPlugin::<UniverseGridPrecision>::default(),
+            GizmoPlugin,
         ))
     }
 }
