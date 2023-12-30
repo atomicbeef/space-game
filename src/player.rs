@@ -26,6 +26,7 @@ pub struct PlayerBundle {
     pub damping: Damping,
     pub external_impulse: ExternalImpulse,
     pub grid_cell: UniverseGrid,
+    pub transform_interpolation: TransformInterpolation,
 }
 
 #[derive(Event)]
@@ -74,6 +75,7 @@ impl Command for SpawnPlayer {
                 },
                 external_impulse: ExternalImpulse::default(),
                 grid_cell: self.grid_cell,
+                transform_interpolation: TransformInterpolation::default(),
             })
             .with_children(|parent| {
                 parent.spawn(PlayerCameraBundle::new(Transform::from_xyz(0.0, 0.95, 0.0)));

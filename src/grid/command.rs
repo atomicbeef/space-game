@@ -55,6 +55,7 @@ impl Command for SpawnGrid {
                 RigidBody::Dynamic,
                 Ccd::enabled(),
                 UniverseGrid::default(),
+                TransformInterpolation::default(),
             ))
             .push_children(&chunk_entities);
 

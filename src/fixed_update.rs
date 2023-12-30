@@ -72,9 +72,10 @@ pub trait SetupRapier {
 impl SetupRapier for App {
     fn setup_rapier(&mut self) -> &mut Self {
         let rapier_config = RapierConfiguration {
-            timestep_mode: TimestepMode::Fixed {
+            timestep_mode: TimestepMode::Interpolated {
                 dt: PHYSICS_TIMESTEP,
                 substeps: 1,
+                time_scale: 1.0,
             },
             gravity: Vec3::default(),
             force_update_from_transform_changes: true,
