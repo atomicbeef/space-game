@@ -364,6 +364,7 @@ pub fn regenerate_chunk_meshes(
         commands
             .entity(chunk_changed.0)
             .insert(mesh_handle)
+            // Work around mesh AABBs not being updated automatically: https://github.com/bevyengine/bevy/issues/4294
             .remove::<Aabb>();
     }
 }
