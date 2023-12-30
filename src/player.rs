@@ -1,8 +1,6 @@
 use bevy::{
     ecs::system::{Command, SystemState},
     prelude::*,
-    transform::TransformSystem,
-    window::{CursorGrabMode, PrimaryWindow},
 };
 use bevy_rapier3d::prelude::*;
 use big_space::FloatingOrigin;
@@ -142,43 +140,13 @@ fn control_newly_spawned_player(
     }
 }
 
-fn draw_reticle(
-    window_query: Query<&Window, With<PrimaryWindow>>,
-    camera_auery: Query<&GlobalTransform, (With<PlayerCamera>, With<ActiveCamera>)>,
-    mut gizmos: Gizmos,
-) {
-    let Ok(window) = window_query.get_single() else {
-        return;
-    };
-
-    if window.cursor.grab_mode == CursorGrabMode::None {
-        return;
-    }
-
-    let Ok(camera_transform) = camera_auery.get_single() else {
-        return;
-    };
-
-    gizmos.circle(
-        camera_transform.translation() + camera_transform.forward() * 3.0,
-        -camera_transform.forward(),
-        0.005,
-        Color::WHITE,
-    );
-}
-
 pub struct PlayerPlugin;
 
 impl Plugin for PlayerPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<PlayerSpawned>()
-            .add_systems(
-                PostUpdate,
-                draw_reticle.after(TransformSystem::TransformPropagate),
-            )
-            .add_systems(
-                FixedUpdate,
-                control_newly_spawned_player.in_set(FixedUpdateSet::Update),
-            );
+        app.add_event::<PlayerSpawned>().add_systems(
+            FixedUpdate,
+            control_newly_spawned_player.in_set(FixedUpdateSet::Update),
+        );
     }
 }

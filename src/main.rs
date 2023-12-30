@@ -1,7 +1,9 @@
+use bevy::core_pipeline::clear_color::ClearColorConfig;
 use bevy::pbr::ExtendedMaterial;
 use bevy::prelude::*;
 
 use bevy::render::view::RenderLayers;
+use bevy::sprite::MaterialMesh2dBundle;
 use big_space::FloatingOrigin;
 use space_game::app_setup::{SetupBevyPlugins, SetupDebug, SetupGame, SetupMaterials};
 use space_game::building::BuildMarker;
@@ -14,6 +16,7 @@ use space_game::grid::chunk::{Chunk, CHUNK_SIZE_CUBED};
 use space_game::grid::{command::SpawnGrid, ChunkPos, Grid};
 use space_game::player::SpawnPlayer;
 use space_game::raycast_selection::SelectionSource;
+use space_game::reticle::Reticle;
 use space_game::UniverseGrid;
 
 fn main() {
@@ -33,6 +36,7 @@ fn setup_test_scene(
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut building_materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
     mut commands: Commands,
+    mut color_materials: ResMut<Assets<ColorMaterial>>,
 ) {
     commands.spawn((
         Camera3dBundle {
@@ -98,6 +102,26 @@ fn setup_test_scene(
             ..default()
         },
         UniverseGrid::default(),
+    ));
+
+    commands.spawn(Camera2dBundle {
+        camera: Camera {
+            order: 1,
+            ..Default::default()
+        },
+        camera_2d: Camera2d {
+            clear_color: ClearColorConfig::None,
+        },
+        ..Default::default()
+    });
+
+    commands.spawn((
+        MaterialMesh2dBundle {
+            mesh: meshes.add(Mesh::from(shape::Circle::new(2.5))).into(),
+            material: color_materials.add(ColorMaterial::from(Color::WHITE)),
+            ..Default::default()
+        },
+        Reticle,
     ));
 
     commands.add(SpawnPlayer::new(

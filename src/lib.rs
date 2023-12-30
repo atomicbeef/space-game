@@ -11,6 +11,7 @@ pub mod player;
 pub mod player_camera;
 pub mod player_controller;
 pub mod raycast_selection;
+pub mod reticle;
 pub mod settings;
 
 pub const PHYSICS_TIMESTEP: f32 = 1.0 / 64.0;

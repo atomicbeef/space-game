@@ -13,6 +13,7 @@ use crate::grid::plugin::GridPlugin;
 use crate::player::PlayerPlugin;
 use crate::player_controller::PlayerControllerPlugin;
 use crate::raycast_selection::SelectionPlugin;
+use crate::reticle::ReticlePlugin;
 use crate::settings::{DebugSettingsPlugin, Settings};
 use crate::UniverseGridPrecision;
 
@@ -50,11 +51,8 @@ impl SetupGame for App {
                 GridPlugin,
                 SelectionPlugin,
                 BuildingPlugin,
+                ReticlePlugin,
             ))
-            .insert_resource(GizmoConfig {
-                depth_bias: -1.0,
-                ..Default::default()
-            })
     }
 }
 

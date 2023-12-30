@@ -10,7 +10,7 @@ pub struct ActiveCamera;
 fn cycle_cameras(
     input: Res<Input<KeyCode>>,
     mut active_camera_query: Query<(Entity, Option<&Parent>), With<ActiveCamera>>,
-    mut camera_query: Query<(Entity, Option<&Parent>, &mut Camera)>,
+    mut camera_query: Query<(Entity, Option<&Parent>, &mut Camera), Without<Camera2d>>,
     mut commands: Commands,
 ) {
     if input.just_pressed(KeyCode::F1) {
