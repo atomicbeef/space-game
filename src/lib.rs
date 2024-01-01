@@ -7,6 +7,7 @@ pub mod camera;
 pub mod fixed_update;
 pub mod free_camera;
 pub mod grid;
+pub mod pause;
 pub mod player;
 pub mod player_camera;
 pub mod player_controller;

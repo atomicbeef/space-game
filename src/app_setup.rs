@@ -10,6 +10,7 @@ use crate::building_material::BuildingMaterialPlugin;
 use crate::camera::{CameraDebugPlugin, CameraPlugin};
 use crate::free_camera::FreeCameraPlugin;
 use crate::grid::plugin::GridPlugin;
+use crate::pause::PausePlugin;
 use crate::player::PlayerPlugin;
 use crate::player_controller::PlayerControllerPlugin;
 use crate::raycast_selection::SelectionPlugin;
@@ -44,6 +45,7 @@ impl SetupGame for App {
         self.insert_resource(Settings::default())
             .add_systems(Update, close_on_esc)
             .add_plugins((
+                PausePlugin,
                 CameraPlugin,
                 FreeCameraPlugin,
                 PlayerPlugin,
