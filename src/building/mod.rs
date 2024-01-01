@@ -102,7 +102,9 @@ fn create_build_request_events(
     let chunk_transform_affine = chunk_transform.affine();
     let chunk_transform_inverse = chunk_transform_affine.inverse();
 
-    let inverse_normal = chunk_transform_inverse.transform_vector3(intersection.normal);
+    let inverse_normal = chunk_transform_inverse
+        .transform_vector3(intersection.normal)
+        .round();
 
     let snapped_intersection = snap_to_grid(
         chunk_transform_inverse.transform_point(intersection.point),
@@ -111,9 +113,9 @@ fn create_build_request_events(
         - inverse_normal * 0.5;
 
     let block_pos = BlockPos {
-        x: snapped_intersection.x as u8,
-        y: snapped_intersection.y as u8,
-        z: snapped_intersection.z as u8,
+        x: snapped_intersection.x.floor() as u8,
+        y: snapped_intersection.y.floor() as u8,
+        z: snapped_intersection.z.floor() as u8,
     };
 
     if mouse_buttons.just_pressed(MouseButton::Left) {
@@ -244,13 +246,11 @@ pub struct BuildingPlugin;
 
 impl Plugin for BuildingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_event::<PlaceBlockRequest>()
-            .add_systems(Update, create_build_request_events)
-            .add_systems(
-                FixedUpdate,
-                (move_build_marker, place_blocks)
-                    .chain()
-                    .in_set(FixedUpdateSet::Update),
-            );
+        app.add_event::<PlaceBlockRequest>().add_systems(
+            FixedUpdate,
+            (move_build_marker, place_blocks, create_build_request_events)
+                .chain()
+                .in_set(FixedUpdateSet::Update),
+        );
     }
 }
