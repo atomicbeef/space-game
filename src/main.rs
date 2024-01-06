@@ -5,7 +5,9 @@ use bevy::prelude::*;
 use bevy::render::view::RenderLayers;
 use bevy::sprite::MaterialMesh2dBundle;
 use big_space::FloatingOrigin;
-use space_game::app_setup::{SetupBevyPlugins, SetupDebug, SetupGame, SetupMaterials};
+use space_game::app_setup::{
+    AssetInitialization, SetupBevyPlugins, SetupDebug, SetupGame, SetupMaterials,
+};
 use space_game::building::BuildMarker;
 use space_game::building_material::BuildingMaterial;
 use space_game::camera::ActiveCamera;
@@ -27,7 +29,7 @@ fn main() {
         .setup_game()
         .setup_materials()
         .setup_debug()
-        .add_systems(Startup, setup_test_scene)
+        .add_systems(Startup, setup_test_scene.after(AssetInitialization))
         .run();
 }
 

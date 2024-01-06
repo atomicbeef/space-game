@@ -211,7 +211,7 @@ fn place_blocks(
                 let chunk_entity = commands
                     .spawn(ChunkBundle::new(
                         request.pos.chunk_pos,
-                        building_material_handle.0.clone().unwrap(),
+                        building_material_handle.0.clone(),
                     ))
                     .id();
                 commands.entity(request.grid).add_child(chunk_entity);

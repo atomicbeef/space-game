@@ -34,7 +34,7 @@ impl Command for SpawnGrid {
 
             let entity = commands
                 .spawn((
-                    ChunkBundle::new(*pos, material_handle.0.clone().unwrap()),
+                    ChunkBundle::new(*pos, material_handle.0.clone()),
                     mesh_handle,
                     collider,
                 ))

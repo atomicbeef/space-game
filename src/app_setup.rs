@@ -82,3 +82,6 @@ impl SetupMaterials for App {
         self.add_plugins(BuildingMaterialPlugin)
     }
 }
+
+#[derive(Clone, Debug, Hash, PartialEq, Eq, SystemSet)]
+pub struct AssetInitialization;

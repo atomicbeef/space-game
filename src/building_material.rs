@@ -2,6 +2,8 @@ use bevy::pbr::{ExtendedMaterial, MaterialExtension};
 use bevy::prelude::*;
 use bevy::render::render_resource::{AsBindGroup, ShaderRef};
 
+use crate::app_setup::AssetInitialization;
+
 #[derive(Asset, AsBindGroup, Reflect, Debug, Clone)]
 pub struct BuildingMaterial {
     #[uniform(100)]
@@ -27,9 +29,7 @@ impl MaterialExtension for BuildingMaterial {
 }
 
 #[derive(Resource)]
-pub struct BuildingMaterialHandle(
-    pub Option<Handle<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
-);
+pub struct BuildingMaterialHandle(pub Handle<ExtendedMaterial<StandardMaterial, BuildingMaterial>>);
 
 fn init_building_material(
     mut materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
@@ -40,7 +40,7 @@ fn init_building_material(
         extension: BuildingMaterial::default(),
     });
 
-    building_material_handle.0 = Some(material_handle);
+    building_material_handle.0 = material_handle;
 }
 
 pub struct BuildingMaterialPlugin;
@@ -50,7 +50,7 @@ impl Plugin for BuildingMaterialPlugin {
         app.add_plugins(MaterialPlugin::<
             ExtendedMaterial<StandardMaterial, BuildingMaterial>,
         >::default())
-            .insert_resource(BuildingMaterialHandle(None))
-            .add_systems(Startup, init_building_material);
+            .insert_resource(BuildingMaterialHandle(Handle::default()))
+            .add_systems(Startup, init_building_material.in_set(AssetInitialization));
     }
 }
