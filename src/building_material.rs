@@ -32,11 +32,18 @@ impl MaterialExtension for BuildingMaterial {
 pub struct BuildingMaterialHandle(pub Handle<ExtendedMaterial<StandardMaterial, BuildingMaterial>>);
 
 fn init_building_material(
+    asset_server: Res<AssetServer>,
     mut materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
     mut building_material_handle: ResMut<BuildingMaterialHandle>,
 ) {
     let material_handle = materials.add(ExtendedMaterial {
-        base: Color::rgb(0.5, 0.5, 0.5).into(),
+        base: StandardMaterial {
+            base_color_texture: Some(asset_server.load("aluminum/albedo.png")),
+            metallic: 1.0,
+            perceptual_roughness: 0.79,
+            normal_map_texture: Some(asset_server.load("aluminum/normal.png")),
+            ..Default::default()
+        },
         extension: BuildingMaterial::default(),
     });
 

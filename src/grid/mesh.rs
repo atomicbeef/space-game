@@ -333,6 +333,7 @@ pub fn generate_chunk_mesh(chunk: &Chunk) -> Mesh {
     mesh.insert_attribute(Mesh::ATTRIBUTE_NORMAL, normals);
     mesh.insert_attribute(Mesh::ATTRIBUTE_UV_0, uvs);
     mesh.set_indices(Some(Indices::U32(triangles)));
+    mesh.generate_tangents().unwrap();
 
     mesh
 }
