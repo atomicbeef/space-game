@@ -79,6 +79,18 @@ impl Command for SpawnPlayer {
             })
             .with_children(|parent| {
                 parent.spawn(PlayerCameraBundle::new(Transform::from_xyz(0.0, 0.95, 0.0)));
+                parent.spawn(SpotLightBundle {
+                    transform: Transform::from_xyz(0.0, 0.95, -0.3),
+                    spot_light: SpotLight {
+                        color: Color::WHITE,
+                        intensity: 0.0,
+                        shadows_enabled: true,
+                        range: 10.0,
+                        radius: 1.0,
+                        ..Default::default()
+                    },
+                    ..Default::default()
+                });
             })
             .id();
 

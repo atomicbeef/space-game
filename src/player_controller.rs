@@ -1,3 +1,4 @@
+use bevy::input::common_conditions::input_just_pressed;
 use bevy::input::mouse::MouseMotion;
 use bevy::prelude::*;
 use bevy::window::{CursorGrabMode, PrimaryWindow};
@@ -119,6 +120,29 @@ fn cursor_lock(
     }
 }
 
+fn toggle_flashlight(
+    active_player_children_query: Query<&Children, With<ActivelyControlled>>,
+    mut flashlight_query: Query<&mut SpotLight>,
+) {
+    let Ok(children) = active_player_children_query.get_single() else {
+        return;
+    };
+
+    for child in children.iter() {
+        let Ok(mut flashlight) = flashlight_query.get_mut(*child) else {
+            continue;
+        };
+
+        flashlight.intensity = if flashlight.intensity > 0.0 {
+            0.0
+        } else {
+            500.0
+        };
+
+        break;
+    }
+}
+
 pub struct PlayerControllerPlugin;
 
 impl Plugin for PlayerControllerPlugin {
@@ -126,6 +150,10 @@ impl Plugin for PlayerControllerPlugin {
         app.add_systems(
             FixedUpdate,
             (cursor_lock, player_movement).in_set(FixedUpdateSet::Update),
+        )
+        .add_systems(
+            Update,
+            (toggle_flashlight.run_if(input_just_pressed(KeyCode::L)),),
         );
     }
 }
