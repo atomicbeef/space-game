@@ -2,13 +2,12 @@ use bevy::ecs::system::{Command, SystemState};
 use bevy::prelude::*;
 use bevy_rapier3d::prelude::*;
 
-use crate::building_material::BuildingMaterialHandle;
 use crate::UniverseGrid;
 
 use super::chunk::ChunkBundle;
 use super::collider::generate_collider_for_chunk;
 use super::mesh::generate_chunk_mesh;
-use super::{ChunkPos, Grid};
+use super::{ChunkPos, Grid, GridMaterialHandle};
 
 pub struct SpawnGrid {
     pub transform: Transform,
@@ -19,7 +18,7 @@ impl Command for SpawnGrid {
     fn apply(mut self, world: &mut World) {
         let mut system_state: SystemState<(
             ResMut<Assets<Mesh>>,
-            Res<BuildingMaterialHandle>,
+            Res<GridMaterialHandle>,
             Commands,
         )> = SystemState::new(world);
 
@@ -34,8 +33,9 @@ impl Command for SpawnGrid {
 
             let entity = commands
                 .spawn((
-                    ChunkBundle::new(*pos, material_handle.0.clone()),
+                    ChunkBundle::new(*pos),
                     mesh_handle,
+                    material_handle.0.clone(),
                     collider,
                 ))
                 .id();

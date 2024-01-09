@@ -88,3 +88,6 @@ impl Grid {
         }
     }
 }
+
+#[derive(Resource)]
+pub struct GridMaterialHandle(pub Handle<StandardMaterial>);

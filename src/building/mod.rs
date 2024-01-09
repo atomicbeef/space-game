@@ -164,7 +164,7 @@ fn place_blocks(
     mut place_block_requests: EventReader<PlaceBlockRequest>,
     mut grid_query: Query<&mut Grid>,
     mut commands: Commands,
-    building_material_handle: Res<BuildingMaterialHandle>,
+    material_handle: Res<BuildingMaterialHandle>,
     mut chunk_changed_writer: EventWriter<ChunkChanged>,
 ) {
     dirty_chunks.clear();
@@ -209,9 +209,9 @@ fn place_blocks(
                 }
             } else {
                 let chunk_entity = commands
-                    .spawn(ChunkBundle::new(
-                        request.pos.chunk_pos,
-                        building_material_handle.0.clone(),
+                    .spawn((
+                        ChunkBundle::new(request.pos.chunk_pos),
+                        material_handle.0.clone(),
                     ))
                     .id();
                 commands.entity(request.grid).add_child(chunk_entity);

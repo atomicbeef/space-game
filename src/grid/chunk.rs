@@ -1,6 +1,6 @@
-use bevy::{pbr::ExtendedMaterial, prelude::*};
+use bevy::prelude::*;
 
-use crate::{building_material::BuildingMaterial, raycast_selection::Selectable};
+use crate::raycast_selection::Selectable;
 
 use super::{block::Block, ChunkPos};
 
@@ -67,17 +67,12 @@ pub struct ChunkBundle {
     pub chunk_pos: ChunkPos,
     pub spatial_bundle: SpatialBundle,
     pub selectable: Selectable,
-    pub material: Handle<ExtendedMaterial<StandardMaterial, BuildingMaterial>>,
 }
 
 impl ChunkBundle {
-    pub fn new(
-        chunk_pos: ChunkPos,
-        material: Handle<ExtendedMaterial<StandardMaterial, BuildingMaterial>>,
-    ) -> Self {
+    pub fn new(chunk_pos: ChunkPos) -> Self {
         Self {
             chunk_pos,
-            material,
             spatial_bundle: SpatialBundle {
                 transform: Transform::from_translation(Vec3::new(
                     chunk_pos.x as f32 * CHUNK_SIZE as f32 / 4.0,
