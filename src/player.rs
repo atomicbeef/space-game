@@ -1,13 +1,14 @@
 use bevy::{
+    core_pipeline::Skybox,
     ecs::system::{Command, SystemState},
     prelude::*,
 };
 use bevy_rapier3d::prelude::*;
 use big_space::FloatingOrigin;
 
-use crate::camera::ActiveCamera;
 use crate::fixed_update::FixedUpdateSet;
 use crate::player_controller::ActivelyControlled;
+use crate::{camera::ActiveCamera, skybox::SkyboxHandle};
 use crate::{
     player_camera::{PlayerCamera, PlayerCameraBundle},
     UniverseGrid,
@@ -42,11 +43,12 @@ impl Command for SpawnPlayer {
         let mut system_state: SystemState<(
             ResMut<Assets<Mesh>>,
             ResMut<Assets<StandardMaterial>>,
+            Res<SkyboxHandle>,
             Commands,
             EventWriter<PlayerSpawned>,
         )> = SystemState::new(world);
 
-        let (mut meshes, mut materials, mut commands, mut spawn_events) =
+        let (mut meshes, mut materials, skybox_handle, mut commands, mut spawn_events) =
             system_state.get_mut(world);
 
         let id = commands
@@ -78,7 +80,10 @@ impl Command for SpawnPlayer {
                 transform_interpolation: TransformInterpolation::default(),
             })
             .with_children(|parent| {
-                parent.spawn(PlayerCameraBundle::new(Transform::from_xyz(0.0, 0.95, 0.0)));
+                parent.spawn(PlayerCameraBundle::new(
+                    Transform::from_xyz(0.0, 0.95, 0.0),
+                    Skybox(skybox_handle.0.clone()),
+                ));
                 parent.spawn(SpotLightBundle {
                     transform: Transform::from_xyz(0.0, 0.95, -0.3),
                     spot_light: SpotLight {

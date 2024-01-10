@@ -1,4 +1,4 @@
-use bevy::prelude::*;
+use bevy::{core_pipeline::Skybox, prelude::*};
 
 use crate::raycast_selection::SelectionSource;
 
@@ -10,10 +10,11 @@ pub struct PlayerCameraBundle {
     pub camera: Camera3dBundle,
     pub player_camera: PlayerCamera,
     pub selection_source: SelectionSource,
+    pub skybox: Skybox,
 }
 
 impl PlayerCameraBundle {
-    pub fn new(transform: Transform) -> Self {
+    pub fn new(transform: Transform, skybox: Skybox) -> Self {
         Self {
             camera: Camera3dBundle {
                 transform,
@@ -25,6 +26,7 @@ impl PlayerCameraBundle {
             },
             player_camera: PlayerCamera,
             selection_source: SelectionSource::new(),
+            skybox,
         }
     }
 }

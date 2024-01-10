@@ -16,6 +16,7 @@ use crate::player_controller::PlayerControllerPlugin;
 use crate::raycast_selection::SelectionPlugin;
 use crate::reticle::ReticlePlugin;
 use crate::settings::{DebugSettingsPlugin, Settings};
+use crate::skybox::SkyboxPlugin;
 use crate::UniverseGridPrecision;
 
 pub trait SetupBevyPlugins {
@@ -54,6 +55,7 @@ impl SetupGame for App {
                 SelectionPlugin,
                 BuildingPlugin,
                 ReticlePlugin,
+                SkyboxPlugin,
             ))
     }
 }

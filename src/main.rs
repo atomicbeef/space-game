@@ -1,4 +1,5 @@
 use bevy::core_pipeline::clear_color::ClearColorConfig;
+use bevy::core_pipeline::Skybox;
 use bevy::pbr::ExtendedMaterial;
 use bevy::prelude::*;
 
@@ -19,6 +20,7 @@ use space_game::grid::{command::SpawnGrid, ChunkPos, Grid};
 use space_game::player::SpawnPlayer;
 use space_game::raycast_selection::SelectionSource;
 use space_game::reticle::Reticle;
+use space_game::skybox::SkyboxHandle;
 use space_game::UniverseGrid;
 
 fn main() {
@@ -34,12 +36,27 @@ fn main() {
 }
 
 fn setup_test_scene(
+    mut ambient_light: ResMut<AmbientLight>,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<StandardMaterial>>,
     mut building_materials: ResMut<Assets<ExtendedMaterial<StandardMaterial, BuildingMaterial>>>,
     mut commands: Commands,
     mut color_materials: ResMut<Assets<ColorMaterial>>,
+    skybox_handle: Res<SkyboxHandle>,
 ) {
+    ambient_light.color = Color::rgb(0.65, 0.75, 0.73);
+    ambient_light.brightness = 0.04;
+
+    commands.spawn(DirectionalLightBundle {
+        directional_light: DirectionalLight {
+            color: Color::WHITE,
+            illuminance: 10000.0,
+            shadows_enabled: true,
+            ..Default::default()
+        },
+        ..Default::default()
+    });
+
     commands.spawn((
         Camera3dBundle {
             transform: Transform::from_xyz(-2.0, 2.5, 5.0).looking_at(Vec3::ZERO, Vec3::Y),
@@ -52,6 +69,7 @@ fn setup_test_scene(
         // Show the locally controlled player in the free camera
         RenderLayers::from_layers(&[0, 1]),
         UniverseGrid::default(),
+        Skybox(skybox_handle.0.clone()),
     ));
 
     commands.add(SpawnPlayer::new(

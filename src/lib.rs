@@ -14,6 +14,7 @@ pub mod player_controller;
 pub mod raycast_selection;
 pub mod reticle;
 pub mod settings;
+pub mod skybox;
 
 pub const PHYSICS_TIMESTEP: f32 = 1.0 / 64.0;
 pub type UniverseGridPrecision = i32;
